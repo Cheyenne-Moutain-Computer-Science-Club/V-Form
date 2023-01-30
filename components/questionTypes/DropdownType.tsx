@@ -21,16 +21,18 @@ export default function DropdownTypeQuestion({
 	}, [selected]);
 
 	return (
-		<div className="m-6 rounded dark:bg-stone-700">
-			<h1 className="h-8 rounded-t bg-gradient-to-r from-indigo-500 via-purple-500 to-pink-500 pl-2 text-2xl font-bold text-white">
-				{id}
+		<div className="my-6 rounded">
+			<h1 className="h-10 rounded-t bg-gradient-to-r from-indigo-500 via-purple-500 to-pink-500 pl-2 pt-1 text-2xl font-bold text-neutral-50">
+				{id + 1}
 			</h1>
-			<h2>{title}</h2>
-			<SearchableDropdown
-				options={items}
-				selectedVal={selected}
-				handleChange={(val) => setSelected(val)}
-			/>
+			<div className="border-2 border-t-0 border-gray-900 p-4">
+				<h2 className="text-lg">{title}</h2>
+				<SearchableDropdown
+					options={items}
+					selectedVal={selected}
+					handleChange={(val) => setSelected(val)}
+				/>
+			</div>
 		</div>
 	);
 }
