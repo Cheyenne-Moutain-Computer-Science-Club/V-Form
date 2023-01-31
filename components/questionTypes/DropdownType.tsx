@@ -25,7 +25,7 @@ export default function DropdownTypeQuestion({
 	}, [selected]);
 
 	return (
-		<div className="my-6">
+		<div className="my-8">
 			<h1 className="bg-accent text-accent h-12 rounded-t border-2 border-gray-900 pl-2 pt-1 text-2xl font-bold">
 				{id + 1}
 			</h1>

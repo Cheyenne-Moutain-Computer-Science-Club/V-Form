@@ -33,7 +33,7 @@ export default function Form(
 	const [value, dataLoading, dataError, snapshot] = useDocumentData(
 		doc(firestore, `forms/${props.slug}`)
 	);
-	const [questionResponses, setQuestionResponses] = useState({});
+	const [questionResponses, setQuestionResponses] = useState([""]);
 
 	if (authLoading || dataLoading) {
 		return (
@@ -100,6 +100,8 @@ export default function Form(
 	const header = value?.header;
 	const options = value?.options;
 
+	console.log(options);
+
 	if (
 		!options.active ||
 		options.endDate.toDate().getTime() < new Date().getTime()
@@ -144,7 +146,10 @@ export default function Form(
 	};
 
 	const updateQuestionResponses = (id: number, response: string) => {
-		let spreadQuestionResponses = { ...questionResponses };
+		let spreadQuestionResponses = [...questionResponses];
+		if (questionsData.length !== spreadQuestionResponses.length) {
+			spreadQuestionResponses = Array.from(Array(questionsData.length));
+		}
 		spreadQuestionResponses[id] = response;
 		setQuestionResponses(spreadQuestionResponses);
 	};
