@@ -4,10 +4,12 @@ export default function SearchableDropdown({
 	options,
 	selectedVal,
 	handleChange,
+	placeholder,
 }: {
 	options: string[];
 	selectedVal: string;
 	handleChange: (val: string) => void;
+	placeholder: string;
 }) {
 	const [query, setQuery] = useState("");
 	const [isOpen, setIsOpen] = useState(false);
@@ -44,43 +46,42 @@ export default function SearchableDropdown({
 	};
 
 	return (
-		<div className="">
+		<div className="w-full py-2">
 			<div className="">
-				<div className="">
-					<input
-						ref={inputRef}
-						type="text"
-						value={getDisplayValue()}
-						name="searchTerm"
-						onChange={(e) => {
-							setQuery(e.target.value);
-							handleChange("");
-						}}
-						onClick={toggle}
-						className="w-36 rounded bg-slate-600 text-white"
-					/>
-				</div>
-				<div className={`${isOpen ? "inline" : "hidden"}`}></div>
+				<input
+					ref={inputRef}
+					type="text"
+					value={getDisplayValue()}
+					name="searchTerm"
+					onChange={(e) => {
+						setQuery(e.target.value);
+						handleChange("");
+					}}
+					onClick={toggle}
+					placeholder={placeholder}
+					className={`h-8 w-80 rounded border-2 border-neutral-800 bg-neutral-50 p-2 text-gray-900 outline-none placeholder:italic placeholder:text-gray-400`}
+				/>
 			</div>
 
 			<div
 				className={`${
 					isOpen ? "absolute" : "hidden"
-				} w-36 bg-slate-600 text-white`}
+				} max-h-48 w-80 overflow-auto rounded border-2 border-neutral-800 bg-neutral-50 text-gray-900`}
 			>
 				{filter(options).map((option: string, index: number) => {
-					if (index < 4)
-						return (
-							<div
-								onClick={() => selectOption(option)}
-								className={`${
-									option === selectedVal ? "bg-slate-500" : ""
-								} hover:bg-slate-300`}
-								key={index}
-							>
-								{option}
-							</div>
-						);
+					return (
+						<div
+							onClick={() => selectOption(option)}
+							className={`${
+								option == selectedVal
+									? "bg-accent text-accent font-semibold"
+									: ""
+							} border-red hover:bg-accent hover:text-accent px-2 py-2 hover:font-semibold`}
+							key={index}
+						>
+							{option}
+						</div>
+					);
 				})}
 			</div>
 		</div>

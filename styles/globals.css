@@ -4,11 +4,26 @@
 
 @layer base {
 	:root {
-		@apply bg-zinc-400 font-sans dark:bg-stone-900;
+		@apply bg-zinc-400 font-sans dark:bg-neutral-50;
 	}
 }
 
 @layer components {
+	/* .bg-accent {
+		@apply bg-gradient-to-r from-indigo-500 via-purple-500 to-pink-500;
+	}
+
+	.text-accent {
+		@apply text-neutral-50;
+	} */
+
+	.bg-accent {
+		@apply bg-gradient-to-r from-amber-300 to-emerald-300;
+	}
+
+	.text-accent {
+		@apply text-gray-900;
+	}
 }
 /* 
 @layer utilities {

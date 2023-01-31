@@ -1,4 +1,6 @@
 import Head from "next/head";
+import Footer from "@/components/footer";
+import { signOut } from "@lib/auth";
 
 export default function Home() {
 	return (
@@ -17,7 +19,9 @@ export default function Home() {
 			</Head>
 			<main>
 				<h1>Welcome to Next.js!</h1>
+				<button onClick={() => signOut()}>SIGN OUT</button>
 			</main>
+			<Footer />
 		</>
 	);
 }

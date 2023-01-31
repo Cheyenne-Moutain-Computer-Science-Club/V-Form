@@ -7,12 +7,16 @@ export default function DropdownTypeQuestion({
 	required,
 	id,
 	update,
+	description,
+	placeholder,
 }: {
 	items: string[];
 	title: string;
 	required: boolean;
 	id: number;
 	update: (id: number, response: string) => void;
+	description: string;
+	placeholder: string;
 }) {
 	const [selected, setSelected] = useState("");
 
@@ -21,16 +25,22 @@ export default function DropdownTypeQuestion({
 	}, [selected]);
 
 	return (
-		<div className="m-6 rounded dark:bg-stone-700">
-			<h1 className="h-8 rounded-t bg-gradient-to-r from-indigo-500 via-purple-500 to-pink-500 pl-2 text-2xl font-bold text-white">
-				{id}
+		<div className="my-6">
+			<h1 className="bg-accent text-accent h-12 rounded-t border-2 border-gray-900 pl-2 pt-1 text-2xl font-bold">
+				{id + 1}
 			</h1>
-			<h2>{title}</h2>
-			<SearchableDropdown
-				options={items}
-				selectedVal={selected}
-				handleChange={(val) => setSelected(val)}
-			/>
+			<div className="rounded-b border-2 border-t-0 border-gray-900 p-4">
+				<h2 className="text-lg">{title}</h2>
+				<h3 className="text-xs">{description}</h3>
+				<SearchableDropdown
+					options={items}
+					selectedVal={selected}
+					handleChange={(val) => {
+						setSelected(val);
+					}}
+					placeholder={placeholder}
+				/>
+			</div>
 		</div>
 	);
 }

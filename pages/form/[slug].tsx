@@ -1,12 +1,21 @@
-import { GetStaticPropsContext } from "next";
+import { GetServerSidePropsContext } from "next";
 import { InferGetServerSidePropsType } from "next";
 import { auth, firestore } from "@lib/firebase";
 import { useAuthState } from "react-firebase-hooks/auth";
 import { useDocumentData } from "react-firebase-hooks/firestore";
 import { signIn } from "@lib/auth";
-import { doc } from "firebase/firestore";
+import {
+	doc,
+	query,
+	collection,
+	where,
+	getDocs,
+	addDoc,
+} from "firebase/firestore";
 import DropdownTypeQuestion from "@components/questionTypes/DropdownType";
 import { useState } from "react";
+import Router from "next/router";
+import Footer from "@/components/footer";
 
 interface question {
 	title: string;
@@ -14,6 +23,7 @@ interface question {
 	required: boolean;
 	type: string;
 	items: string[];
+	placeholder: string;
 }
 
 export default function Form(
@@ -25,31 +35,118 @@ export default function Form(
 	);
 	const [questionResponses, setQuestionResponses] = useState({});
 
-	if (authLoading || dataLoading) return <div>Loading...</div>;
-	if (!user && !authLoading) {
+	if (authLoading || dataLoading) {
 		return (
-			<div>
-				Please <button onClick={() => signIn()}>Log In</button> to
-				continue
+			<div className="flex h-screen flex-col justify-between">
+				<main className="grid h-full items-center">
+					<h1 className="text-center text-3xl font-bold text-gray-900">
+						Loading...
+					</h1>
+				</main>
+				<Footer />
 			</div>
 		);
 	}
+
+	if (!user && !authLoading) {
+		return (
+			<div className="flex h-screen flex-col justify-between">
+				<main className="grid h-full items-center">
+					<h1 className="text-center text-3xl font-bold text-gray-900">
+						Please{" "}
+						<button
+							className="bg-gradient-to-r from-indigo-500 via-purple-500 to-pink-500 bg-clip-text text-transparent underline decoration-gray-900 decoration-dashed decoration-2 hover:decoration-wavy"
+							onClick={() => signIn()}
+						>
+							Log In
+						</button>{" "}
+						to continue
+					</h1>
+				</main>
+				<Footer />
+			</div>
+		);
+	}
+
+	if (!dataLoading && !value) {
+		return (
+			<div className="flex h-screen flex-col justify-between">
+				<main className="grid h-full items-center">
+					<h1 className="text-center text-3xl font-bold text-gray-900">
+						This form does not exist
+					</h1>
+				</main>
+				<Footer />
+			</div>
+		);
+	}
+
+	getDocs(
+		query(
+			collection(firestore, "responses"),
+			where("form", "==", props.slug),
+			where("uid", "==", user?.uid)
+		)
+	).then((result) => {
+		if (result.docs.length > 0) {
+			Router.push({
+				pathname: "/responded",
+				query: { slug: props.slug },
+			});
+		}
+	});
 
 	const questionsData = value?.questions;
 	const header = value?.header;
 	const options = value?.options;
 
-	const sumbitForm = () => {
-		// create new response document
+	if (
+		!options.active ||
+		options.endDate.toDate().getTime() < new Date().getTime()
+	) {
+		return (
+			<div className="flex h-screen flex-col justify-between">
+				<main className="grid h-full items-center">
+					<h1 className="text-center text-3xl font-bold text-gray-900">
+						This form is no longer taking responses
+					</h1>
+				</main>
+				<Footer />
+			</div>
+		);
+	}
+
+	const sumbitForm = async () => {
+		let result = await getDocs(
+			query(
+				collection(firestore, "responses"),
+				where("form", "==", props.slug),
+				where("uid", "==", user?.uid)
+			)
+		);
+
+		if (result.docs.length > 0) {
+			throw Error("User has already responded to this form!");
+		} else {
+			// create new response document
+			await addDoc(collection(firestore, "responses"), {
+				form: props.slug,
+				uid: user?.uid,
+				questionResponses: questionResponses,
+			});
+		}
 		// add form to user doc
 		// redirect to different page
+		Router.push({
+			pathname: "/submitted",
+			query: { slug: props.slug },
+		});
 	};
 
 	const updateQuestionResponses = (id: number, response: string) => {
 		let spreadQuestionResponses = { ...questionResponses };
 		spreadQuestionResponses[id] = response;
 		setQuestionResponses(spreadQuestionResponses);
-		console.log(spreadQuestionResponses);
 	};
 
 	const questionComponents = questionsData.map((q: question, i: number) => {
@@ -62,26 +159,40 @@ export default function Form(
 					id={i}
 					key={i}
 					update={updateQuestionResponses}
+					description={q.description}
+					placeholder={q.placeholder}
 				/>
 			);
 		}
 	});
 
 	return (
-		<div>
-			<h1>{header}</h1>
-			<div className="mt-20 grid grid-cols-9 grid-rows-1">
-				<div className="col-span-7 col-start-2">
-					{questionComponents}
-				</div>
+		<div className="flex h-screen flex-col justify-between">
+			<main className="mb-auto">
+				<div>
+					<div className="mt-20 grid grid-cols-9 grid-rows-1">
+						<h1 className="col-span-5 col-start-3 text-4xl font-bold text-gray-900">
+							{header}
+						</h1>
+						<div className="col-span-5 col-start-3">
+							{questionComponents}
+						</div>
 
-				<button>Submit</button>
-			</div>
+						<button
+							onClick={() => sumbitForm()}
+							className="hover:bg-accent hover:text-accent col-start-5 h-12 w-36 rounded border-2 border-gray-900 hover:font-bold"
+						>
+							Submit
+						</button>
+					</div>
+				</div>
+			</main>
+			<Footer />
 		</div>
 	);
 }
 
-export function getServerSideProps(context: GetStaticPropsContext) {
+export function getServerSideProps(context: GetServerSidePropsContext) {
 	return {
 		props: {
 			slug: context.params?.slug,
