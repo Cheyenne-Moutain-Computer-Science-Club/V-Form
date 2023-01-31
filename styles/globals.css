@@ -4,7 +4,7 @@
 
 @layer base {
 	:root {
-		@apply bg-zinc-400 font-sans dark:bg-neutral-50;
+		@apply bg-neutral-50 font-sans;
 	}
 }
 
