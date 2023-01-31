@@ -16,6 +16,8 @@ import DropdownTypeQuestion from "@components/questionTypes/DropdownType";
 import { useState } from "react";
 import Router from "next/router";
 import Footer from "@/components/footer";
+import MultipleChoiceTypeQuestion from "@/components/questionTypes/MultipleChoiceType";
+import MultipleSelectTypeQuestion from "@/components/questionTypes/MultipleSelectType";
 
 interface question {
 	title: string;
@@ -100,8 +102,6 @@ export default function Form(
 	const header = value?.header;
 	const options = value?.options;
 
-	console.log(options);
-
 	if (
 		!options.active ||
 		options.endDate.toDate().getTime() < new Date().getTime()
@@ -166,6 +166,30 @@ export default function Form(
 					update={updateQuestionResponses}
 					description={q.description}
 					placeholder={q.placeholder}
+				/>
+			);
+		} else if (q.type === "multiple choice") {
+			return (
+				<MultipleChoiceTypeQuestion
+					items={q.items}
+					title={q.title}
+					required={q.required}
+					id={i}
+					key={i}
+					update={updateQuestionResponses}
+					description={q.description}
+				/>
+			);
+		} else if (q.type == "multiple select") {
+			return (
+				<MultipleSelectTypeQuestion
+					items={q.items}
+					title={q.title}
+					required={q.required}
+					id={i}
+					key={i}
+					update={updateQuestionResponses}
+					description={q.description}
 				/>
 			);
 		}
