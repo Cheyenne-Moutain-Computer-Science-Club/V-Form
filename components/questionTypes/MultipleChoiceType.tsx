@@ -1,14 +1,12 @@
-import SearchableDropdown from "../inputs/SearchableDropdown";
 import { useState, useEffect } from "react";
 
-export default function DropdownTypeQuestion({
+export default function MultipleChoiceTypeQuestion({
 	items,
 	title,
 	required,
 	id,
 	update,
 	description,
-	placeholder,
 }: {
 	items: string[];
 	title: string;
@@ -16,13 +14,16 @@ export default function DropdownTypeQuestion({
 	id: number;
 	update: (id: number, response: string) => void;
 	description: string;
-	placeholder: string;
 }) {
 	const [selected, setSelected] = useState("");
 
 	useEffect(() => {
 		update(id, selected);
 	}, [selected]);
+
+	function onChangeValue(e: any) {
+		setSelected(e.target.value);
+	}
 
 	return (
 		<div className="my-8">
@@ -32,14 +33,21 @@ export default function DropdownTypeQuestion({
 			<div className="rounded-b border-2 border-t-0 border-gray-900 p-4">
 				<h2 className="text-lg">{title}</h2>
 				<h3 className="text-xs">{description}</h3>
-				<SearchableDropdown
-					options={items}
-					selectedVal={selected}
-					handleChange={(val) => {
-						setSelected(val);
-					}}
-					placeholder={placeholder}
-				/>
+				<div onChange={onChangeValue} className="py-2">
+					{items.map((item, i) => {
+						return (
+							<div key={i}>
+								<input
+									type="radio"
+									value={item}
+									name={title}
+									className="checked:bg-accent h-4 w-4 appearance-none rounded-full border-2 border-gray-900 bg-neutral-50 focus:ring-0"
+								/>{" "}
+								{item}
+							</div>
+						);
+					})}
+				</div>
 			</div>
 		</div>
 	);

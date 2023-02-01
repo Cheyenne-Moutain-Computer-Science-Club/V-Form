@@ -16,6 +16,8 @@ import DropdownTypeQuestion from "@components/questionTypes/DropdownType";
 import { useState } from "react";
 import Router from "next/router";
 import Footer from "@/components/footer";
+import MultipleChoiceTypeQuestion from "@/components/questionTypes/MultipleChoiceType";
+import MultipleSelectTypeQuestion from "@/components/questionTypes/MultipleSelectType";
 
 interface question {
 	title: string;
@@ -33,7 +35,7 @@ export default function Form(
 	const [value, dataLoading, dataError, snapshot] = useDocumentData(
 		doc(firestore, `forms/${props.slug}`)
 	);
-	const [questionResponses, setQuestionResponses] = useState({});
+	const [questionResponses, setQuestionResponses] = useState([""]);
 
 	if (authLoading || dataLoading) {
 		return (
@@ -144,7 +146,10 @@ export default function Form(
 	};
 
 	const updateQuestionResponses = (id: number, response: string) => {
-		let spreadQuestionResponses = { ...questionResponses };
+		let spreadQuestionResponses = [...questionResponses];
+		if (questionsData.length !== spreadQuestionResponses.length) {
+			spreadQuestionResponses = Array.from(Array(questionsData.length));
+		}
 		spreadQuestionResponses[id] = response;
 		setQuestionResponses(spreadQuestionResponses);
 	};
@@ -161,6 +166,30 @@ export default function Form(
 					update={updateQuestionResponses}
 					description={q.description}
 					placeholder={q.placeholder}
+				/>
+			);
+		} else if (q.type === "multiple choice") {
+			return (
+				<MultipleChoiceTypeQuestion
+					items={q.items}
+					title={q.title}
+					required={q.required}
+					id={i}
+					key={i}
+					update={updateQuestionResponses}
+					description={q.description}
+				/>
+			);
+		} else if (q.type == "multiple select") {
+			return (
+				<MultipleSelectTypeQuestion
+					items={q.items}
+					title={q.title}
+					required={q.required}
+					id={i}
+					key={i}
+					update={updateQuestionResponses}
+					description={q.description}
 				/>
 			);
 		}
