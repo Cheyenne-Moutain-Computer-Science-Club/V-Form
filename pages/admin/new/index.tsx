@@ -1,5 +1,5 @@
 import React from 'react';
-import { NextRouter, useRouter } from 'next/router';
+import { useRouter } from 'next/router';
 import { app } from '@lib/firebase';
 import { collection, query, where, getDocs, getFirestore, doc, setDoc } from 'firebase/firestore';
 import { v4 as uuidv4 } from 'uuid';
@@ -24,10 +24,12 @@ function New() {
     const handleSubmit = async (event: React.SyntheticEvent): Promise<void> => {
         event.preventDefault();
 
+        let formID: string = "";
+
         // TODO: Make this not an infinite loop with a break
         while (true) {
             // Generate ID
-            const formID: string = uuidv4().toString().substring(0, 8);
+            formID = uuidv4().toString().substring(0, 8);
 
             // Pull known form names
             const q = query(collection(db, 'forms'), where('name', '==', formID))
@@ -35,25 +37,29 @@ function New() {
 
             // If the form ID is taken, regenerate
             if (querySnap.empty) {
-                // Create form
-                const poll: Poll = {
-                    header: nameInput,
-                    options: {
-                        active: true,
-                        end: null,
-                        submits: 1
-                    },
-                    questions: []
-                }
-
-                const formRef = doc(db, 'forms', formID);
-                setDoc(formRef, poll);
-
-                // Redirect to edit page
-                router.push(`/admin/edit/${formID}`);
+            
                 break;
             }
         }
+
+        // Create form
+        const poll: Poll = {
+            header: nameInput,
+            options: {
+                active: true,
+                end: null,
+                submits: 1
+            },
+            questions: []
+        }
+
+        const formRef = doc(db, 'forms', formID);
+        
+         setDoc(formRef, poll).then(() => {
+            // Redirect to edit page
+            router.push(`/admin/edit/${formID}`);
+            console.log(formID);
+        });
     }
 
     return (
