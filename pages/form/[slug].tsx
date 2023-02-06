@@ -12,7 +12,7 @@ import {
 	getDocs,
 	addDoc,
 } from "firebase/firestore";
-import DropdownTypeQuestion from "@components/questionTypes/DropdownType";
+import DropdownTypeQuestion from "@/components/questionTypes/DropdownType";
 import { useState } from "react";
 import Router from "next/router";
 import Footer from "@/components/footer";

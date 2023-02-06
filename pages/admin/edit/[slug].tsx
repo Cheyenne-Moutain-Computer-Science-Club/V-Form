@@ -7,7 +7,7 @@ import { useDocumentData } from "react-firebase-hooks/firestore";
 import { signIn } from "@lib/auth";
 import { app } from '@lib/firebase';
 import { collection, query, where, getDocs, getFirestore, doc, setDoc, getDoc, DocumentData } from 'firebase/firestore';
-import DropdownTypeQuestion from "@components/questionTypes/DropdownType";
+import DropdownTypeQuestion from "@/components/questionTypes/DropdownType";
 import { useState } from "react";
 import { FirebaseApp } from "firebase/app";
 import { link } from "fs";
@@ -18,14 +18,32 @@ export default function Poll() {
   // Get URL slug
   const router = useRouter();
   const { slug } = router.query /*?? ""*/;
-  console.log("slug: " + slug);
+  // console.log("slug: " + slug);
 
   // Look for document
   const [value, loading, error, snapshot] = useDocumentData(doc(db, "forms", `${slug}`));
   if (!loading && (!value)) {
     router.push("/admin");
   }
-  // console.log(value?.header);
+
+  //console.log(value?.questions[0].type);
+  const questions: Array<DocumentData> = value?.questions;
+  const questionSet = questions?.map((question: DocumentData, i: number) => {
+    // Sort question type
+    switch (question.type) {
+      case ("dropdown"):
+        return (
+          <div>
+
+          </div>
+        );
+      case ("multiple select"):
+        return;
+      case ("multiple choice"):
+        return;
+    }
+  })
+  
 
 
   // // TODO: Move this function elsewhere
@@ -47,6 +65,9 @@ export default function Poll() {
     <div className="text-black">
       <div>
         <h1>{value?.header}</h1>
+      </div>
+      <div>
+        {questionSet}
       </div>
     </div>
   )
