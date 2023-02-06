@@ -209,7 +209,7 @@ export default function Form(
 
 						<button
 							onClick={() => sumbitForm()}
-							className="hover:bg-accent hover:text-accent col-start-5 h-12 w-36 rounded border-2 border-gray-900 hover:font-bold"
+							className="hover:bg-accent hover:text-accent col-start-5 h-12 w-36 rounded border-2 border-gray-900 transition hover:font-bold"
 						>
 							Submit
 						</button>
