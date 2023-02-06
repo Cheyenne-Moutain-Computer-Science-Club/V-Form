@@ -19,22 +19,33 @@ export default function EditDropdownTypeSheet({
 	placeholder: string;
 }) {
 
-	// TODO: Spreadsheet input always resets
-	const [formData, setFormData] = useState([title, description, Array()]);
+	const editableFormat = () => {
+		let str = "";
+		items.forEach((item) => {
+			str += item + "\n";
+		});
+		return str;
+	}
+
+	const [formData, setFormData] = useState([title, description, items]);
+	useEffect(() => {
+		update(id, formData);
+	}, [formData])
+
 
 	const handleChange = (event: React.ChangeEvent<HTMLInputElement> | React.ChangeEvent<HTMLTextAreaElement>, i: number): void => {
 		let dataCopy = formData;
 		if (i == 2) {
 			// Format spreadsheet data before updatex
 			const formatArr = event.target.value.split("\n")
-			dataCopy[i] = formatArr;
+			dataCopy[2] = formatArr;
 		} else {
 			// Normal data update
 			dataCopy[i] = event.target.value;
 		}
 
         setFormData(dataCopy);
-		console.log(formData);
+		// console.log(formData);
     }
 
 	return (
@@ -51,7 +62,7 @@ export default function EditDropdownTypeSheet({
 						<br className="my-3"/>
 
 						{/* TODO: Add instructions & maybe a number of names indicator */}
-						<textarea onChange={(event) => handleChange(event, 2)} className="bg-gray-200 text-xs w-72 h-72"/>
+						<textarea defaultValue={editableFormat()} onChange={(event) => handleChange(event, 2)} className="bg-gray-200 text-xs w-72 h-72"/>
 					</div>
 				</form>
 			</div>

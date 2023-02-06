@@ -11,6 +11,7 @@ import DropdownTypeQuestion from "@/components/questionTypes/DropdownType";
 import { useState } from "react";
 import { FirebaseApp } from "firebase/app";
 import { link } from "fs";
+import EditDropdownTypeSheet from "@/components/questionTypes/editable/EditDropdownFromSheet";
 
 const db = getFirestore(app);
 
@@ -26,7 +27,15 @@ export default function Poll() {
     router.push("/admin");
   }
 
-  //console.log(value?.questions[0].type);
+  const [questionContent, setQuestionContent] = useState(value?.questions);
+
+  const updateContent = (i: number, content: any) => {
+    let contentCopy = questionContent;
+    contentCopy[i] = content;
+    setQuestionContent(contentCopy);
+  }
+
+
   const questions: Array<DocumentData> = value?.questions;
   const questionSet = questions?.map((question: DocumentData, i: number) => {
     // Sort question type
@@ -34,7 +43,7 @@ export default function Poll() {
       case ("dropdown"):
         return (
           <div>
-
+              <EditDropdownTypeSheet items={question.items} title={question.title} required={question.required} id={i} update={() => {updateContent}} description={question.description} placeholder={question.placeholder}/>
           </div>
         );
       case ("multiple select"):
@@ -42,7 +51,8 @@ export default function Poll() {
       case ("multiple choice"):
         return;
     }
-  })
+  });
+  
   
 
 
