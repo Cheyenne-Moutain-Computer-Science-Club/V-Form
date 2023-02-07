@@ -31,13 +31,28 @@ export default function Poll() {
   const { slug } = router.query /*?? ""*/;
   // console.log("slug: " + slug);
 
-  // Look for document
-  const [value, loading, error, snapshot] = useDocumentData(doc(db, "forms", `${slug}`));
-  if (!loading && (!value)) {
-    router.push("/admin");
-  }
+  // // Look for document
+  // const [value, loading, error, snapshot] = useDocumentData(doc(db, "forms", `${slug}`));
+  // if (!loading && (!value)) {
+  //   router.push("/admin");
+  // }
 
-  const [questionContent, setQuestionContent] = useState(value?.questions);
+  // const [questionContent, setQuestionContent] = useState(value?.questions);
+  const [formData, setFormData] = useState(Object);
+  const [questionContent, setQuestionContent] = useState(Array<DocumentData>);
+
+  (async () => {
+    const docRef = doc(db, "forms", `${slug}`);
+    const docSnap = await getDoc(docRef);
+
+    // Redirect if DNE
+    if (!docSnap.exists()) {
+      router.push("/admin");
+    } else {
+      setQuestionContent(docSnap.data().questions)
+      setFormData(docSnap.data());
+    }
+  })();
 
   const updateContent = (i: number, content: question) => {
     console.log("Content state updated");
@@ -49,12 +64,14 @@ export default function Poll() {
 
   // Database outgoing interaction
   const handleSave = async () => {
+    console.log("call");
     const docRef = doc(db, "forms", `${slug}`);
     await setDoc(docRef, {questions: questionContent}, {merge: true});
   }
 
 
-  const questions: Array<DocumentData> = value?.questions;
+  // const questions: Array<DocumentData> = value?.questions;
+  const questions: Array<DocumentData> = questionContent;
   const questionSet = questions?.map((question: DocumentData, i: number) => {
     // Sort question type
     switch (question.type) {
@@ -83,7 +100,8 @@ export default function Poll() {
   return (
     <div className="text-black">
       <div>
-        <h1>{value?.header}</h1>
+        {/* <h1>{value?.header}</h1> */}
+        <h1>{formData.header}</h1>
       </div>
       <div>
         {questionSet}
