@@ -83,7 +83,7 @@ export default function Poll() {
                 title={question.title} 
                 required={question.required} 
                 id={i} 
-                update={updateContent} 
+                update={() => {updateContent}} 
                 description={question.description} 
                 placeholder={question.placeholder}
                 key={i}
