@@ -1,6 +1,15 @@
 import { format } from "path";
 import { useState, useEffect } from "react";
 
+interface question {
+	title: string;
+	description: string;
+	required: boolean;
+	type: string;
+	items: string[];
+	placeholder: string;
+}
+
 export default function EditDropdownTypeSheet({
 	items,
 	title,
@@ -14,7 +23,7 @@ export default function EditDropdownTypeSheet({
 	title: string;
 	required: boolean;
 	id: number;
-	update: (id: number, response: string) => void;
+	update: (id: number, response: question) => void;
 	description: string;
 	placeholder: string;
 }) {
@@ -27,10 +36,24 @@ export default function EditDropdownTypeSheet({
 		return str;
 	}
 
+	// Format data in accordance to question type before database updates
+	const questionPrep = (data: any): question => {
+		const formatted: question = {
+			title: data[0],
+			description: data[1],
+			required: required,
+			type: "dropdown",
+			items: data[2],
+			placeholder: placeholder
+		}
+		return formatted;
+	}
+
 	const [formData, setFormData] = useState([title, description, items]);
-	useEffect(() => {
-		update(id, formData);
-	}, [formData])
+	// useEffect(() => {
+	// 	console.log("banananana");
+	// 	update(id, questionPrep(formData));
+	// }, [formData]);
 
 
 	const handleChange = (event: React.ChangeEvent<HTMLInputElement> | React.ChangeEvent<HTMLTextAreaElement>, i: number): void => {
@@ -45,7 +68,7 @@ export default function EditDropdownTypeSheet({
 		}
 
         setFormData(dataCopy);
-		// console.log(formData);
+		update(id, questionPrep(dataCopy));
     }
 
 	return (

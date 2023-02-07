@@ -15,6 +15,16 @@ import EditDropdownTypeSheet from "@/components/questionTypes/editable/EditDropd
 
 const db = getFirestore(app);
 
+// TODO: investigate slightly more abstraction
+interface question {
+	title: string;
+	description: string;
+	required: boolean;
+	type: string;
+	items: string[];
+	placeholder: string;
+}
+
 export default function Poll() {
   // Get URL slug
   const router = useRouter();
@@ -29,10 +39,18 @@ export default function Poll() {
 
   const [questionContent, setQuestionContent] = useState(value?.questions);
 
-  const updateContent = (i: number, content: any) => {
+  const updateContent = (i: number, content: question) => {
+    console.log("Content state updated");
     let contentCopy = questionContent;
     contentCopy[i] = content;
     setQuestionContent(contentCopy);
+    // console.log(questionContent);
+  }
+
+  // Database outgoing interaction
+  const handleSave = async () => {
+    const docRef = doc(db, "forms", `${slug}`);
+    await setDoc(docRef, {questions: questionContent}, {merge: true});
   }
 
 
@@ -43,7 +61,16 @@ export default function Poll() {
       case ("dropdown"):
         return (
           <div>
-              <EditDropdownTypeSheet items={question.items} title={question.title} required={question.required} id={i} update={() => {updateContent}} description={question.description} placeholder={question.placeholder}/>
+              <EditDropdownTypeSheet 
+                items={question.items} 
+                title={question.title} 
+                required={question.required} 
+                id={i} 
+                update={() => {updateContent}} 
+                description={question.description} 
+                placeholder={question.placeholder}
+                key={i}
+              />
           </div>
         );
       case ("multiple select"):
@@ -52,24 +79,6 @@ export default function Poll() {
         return;
     }
   });
-  
-  
-
-
-  // // TODO: Move this function elsewhere
-  // const checkExists = async () => {
-  //    // Redirct to admin page if slug does not correspond to a real form
-  //   const q = query(collection(db, 'forms'), where('name', '==', slug?.toString()));
-  //   const querySnap = await getDoc(q);
-  //   if (querySnap.empty) {
-  //     router.push("/admin");
-  //   } else {
-  //     const doc = querySnap.docs[0].data();
-  //     return doc;
-  //   }
-  // }
-  // const form: object = checkExists();
-
 
   return (
     <div className="text-black">
@@ -78,6 +87,9 @@ export default function Poll() {
       </div>
       <div>
         {questionSet}
+      </div>
+      <div>
+        <button onClick={handleSave} className="bg-green-500, px-4 py-2">Save</button>
       </div>
     </div>
   )
