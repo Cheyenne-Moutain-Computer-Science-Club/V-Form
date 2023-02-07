@@ -31,34 +31,18 @@ export default function Poll() {
   const { slug } = router.query /*?? ""*/;
   // console.log("slug: " + slug);
 
-  const [allContent, setAllContent] = useState(Object);
-  const [questionContent, setQuestionContent] = useState([]);
-
-  // // Look for document
-  // const [value, loading, error, snapshot] = useDocumentData(doc(db, "forms", `${slug}`));
-  // if (!loading && !value) {
-  //   router.push("/admin");
-  // }
-
-  // const [questionContent, setQuestionContent] = useState(value?.questions);
-  // console.log(questionContent);
-
-  async () => {
-    const docRef = doc(db, "forms", `${slug}`);
-    const docSnap = await getDoc(docRef);
-    
-    // Redirect if document does not exist
-    if (!docSnap.exists()) {
-      router.push("/admin");
-    } else {
-      setQuestionContent(docSnap.data().questions);
-      setAllContent(docSnap.data());
-    }
+  // Look for document
+  const [value, loading, error, snapshot] = useDocumentData(doc(db, "forms", `${slug}`));
+  if (!loading && (!value)) {
+    router.push("/admin");
   }
 
+  const [questionContent, setQuestionContent] = useState(value?.questions);
+
   const updateContent = (i: number, content: question) => {
+    console.log("Content state updated");
     let contentCopy = questionContent;
-    //contentCopy[i] = content;
+    contentCopy[i] = content;
     setQuestionContent(contentCopy);
     // console.log(questionContent);
   }
@@ -70,8 +54,7 @@ export default function Poll() {
   }
 
 
-  // const questions: Array<DocumentData> = value?.questions;
-  const questions: Array<DocumentData> = questionContent;
+  const questions: Array<DocumentData> = value?.questions;
   const questionSet = questions?.map((question: DocumentData, i: number) => {
     // Sort question type
     switch (question.type) {
@@ -83,7 +66,7 @@ export default function Poll() {
                 title={question.title} 
                 required={question.required} 
                 id={i} 
-                update={() => {updateContent}} 
+                update={updateContent} 
                 description={question.description} 
                 placeholder={question.placeholder}
                 key={i}
@@ -100,8 +83,7 @@ export default function Poll() {
   return (
     <div className="text-black">
       <div>
-        {/* <h1>{value?.header}</h1> */}
-        {allContent.header}
+        <h1>{value?.header}</h1>
       </div>
       <div>
         {questionSet}
