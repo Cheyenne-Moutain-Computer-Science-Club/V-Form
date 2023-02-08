@@ -41,10 +41,10 @@ export default function Poll() {
   const [formData, setFormData] = useState(Object);
   const [questionContent, setQuestionContent] = useState(Array<DocumentData>);
 
-  (async () => {
-    const docRef = doc(db, "forms", `${slug}`);
-    const docSnap = await getDoc(docRef);
-
+  const docRef = doc(db, "forms", `${slug}`);
+  // const docSnap = await getDoc(docRef);
+  getDoc(docRef).then((docSnap) => {
+    console.log(docSnap);
     console.warn(docSnap.exists());
     // Redirect if DNE
     if (!docSnap.exists()) {
@@ -53,7 +53,7 @@ export default function Poll() {
       setQuestionContent(docSnap.data().questions)
       setFormData(docSnap.data());
     }
-  })();
+  });
 
   const updateContent = (i: number, content: question) => {
     console.log("Content state updated");
