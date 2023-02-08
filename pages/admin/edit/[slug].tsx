@@ -45,6 +45,7 @@ export default function Poll() {
     const docRef = doc(db, "forms", `${slug}`);
     const docSnap = await getDoc(docRef);
 
+    console.warn(docSnap.exists());
     // Redirect if DNE
     if (!docSnap.exists()) {
       router.push("/admin");
@@ -64,7 +65,7 @@ export default function Poll() {
 
   // Database outgoing interaction
   const handleSave = async () => {
-    console.log("call");
+    console.log(questionContent);
     const docRef = doc(db, "forms", `${slug}`);
     await setDoc(docRef, {questions: questionContent}, {merge: true});
   }
