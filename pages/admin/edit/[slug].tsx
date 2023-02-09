@@ -19,7 +19,7 @@ interface question {
 const onMount = async (slug: any) => {
   const docRef = doc(db, "forms", `${slug}`);
     const docSnap = await getDoc(docRef);
-    console.log(`slug (${slug}) has doc?`, docSnap.exists());
+    // console.log(`slug (${slug}) has doc?`, docSnap.exists());
 
     // Redirect if DNE
     if (!docSnap.exists()) {
@@ -58,7 +58,8 @@ export default function Edit() {
   // Database outgoing interaction
   const handleSave = async () => {
     // TODO: remove blank lines
-    console.log(questionContent);
+    // TODO: confirmation
+    // console.log(questionContent);
     const docRef = doc(db, "forms", `${slug}`);
     await setDoc(docRef, {questions: questionContent}, {merge: true});
   }
@@ -100,6 +101,7 @@ export default function Edit() {
       </div>
       <div>
         <button onClick={handleSave} className="bg-green-500, px-4 py-2">Save</button>
+        <button className="bg-rose-500">Cancel</button>
       </div>
     </div>
   )

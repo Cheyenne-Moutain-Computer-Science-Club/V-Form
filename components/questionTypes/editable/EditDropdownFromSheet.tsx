@@ -68,9 +68,23 @@ export default function EditDropdownTypeSheet({
 
 	return (
 		<div className="my-8">
-			<h1 className="bg-accent text-accent h-12 rounded-t border-2 border-gray-900 pl-2 pt-1 text-2xl font-bold">
-				{id + 1}
-			</h1>
+			<div className="rounded-t border-2 border-gray-900 pl-2 pt-1 h-12 bg-accent flex justify-between pr-2">
+				<h1 className="text-accent text-2xl font-bold">
+					{id + 1}
+				</h1>
+				<svg
+					aria-hidden="true"
+					fill="none"
+					stroke="currentColor"
+					strokeWidth={1.5}
+					viewBox="0 0 24 24"
+					xmlns="http://www.w3.org/2000/svg"
+					className="h-8 w-8 rounded pt-1 text-neutral-50 bg-gray-900 hover:bg-neutral-50 hover:text-gray-900 hover:cursor-pointer"
+						>
+  					<path stroke-linecap="round" stroke-linejoin="round" d="M19.5 12h-15" />
+
+				</svg>
+			</div>
 			<div className="rounded-b border-2 border-t-0 border-gray-900 p-4">
 				<form>
 					<div className="flex flex-col">
