@@ -12,7 +12,7 @@ import {
 	getDocs,
 	addDoc,
 } from "firebase/firestore";
-import DropdownTypeQuestion from "@components/questionTypes/DropdownType";
+import DropdownTypeQuestion from "@/components/questionTypes/DropdownType";
 import { useState } from "react";
 import Router from "next/router";
 import Footer from "@/components/footer";
@@ -209,7 +209,7 @@ export default function Form(
 
 						<button
 							onClick={() => sumbitForm()}
-							className="hover:bg-accent hover:text-accent col-start-5 h-12 w-36 rounded border-2 border-gray-900 hover:font-bold"
+							className="hover:bg-accent hover:text-accent col-start-5 h-12 w-36 rounded border-2 border-gray-900 transition hover:font-bold"
 						>
 							Submit
 						</button>
