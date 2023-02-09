@@ -1,5 +1,4 @@
-import { format } from "path";
-import { useState, useEffect } from "react";
+import { useState } from "react";
 
 interface question {
 	title: string;
@@ -50,10 +49,6 @@ export default function EditDropdownTypeSheet({
 	}
 
 	const [formData, setFormData] = useState([title, description, items]);
-	// useEffect(() => {
-	// 	console.log("banananana");
-	// 	update(id, questionPrep(formData));
-	// }, [formData]);
 
 
 	const handleChange = (event: React.ChangeEvent<HTMLInputElement> | React.ChangeEvent<HTMLTextAreaElement>, i: number): void => {

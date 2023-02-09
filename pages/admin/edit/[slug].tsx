@@ -1,18 +1,8 @@
-import { GetStaticPropsContext } from "next";
-import { InferGetServerSidePropsType } from "next";
 import { useRouter } from "next/router";
-import { auth, firestore } from "@lib/firebase";
-import { useAuthState } from "react-firebase-hooks/auth";
-import { useDocumentData } from "react-firebase-hooks/firestore";
-import { signIn } from "@lib/auth";
 import { app } from '@lib/firebase';
-import { collection, query, where, getDocs, getFirestore, doc, setDoc, getDoc, DocumentData } from 'firebase/firestore';
-import DropdownTypeQuestion from "@/components/questionTypes/DropdownType";
+import { getFirestore, doc, setDoc, getDoc, DocumentData } from 'firebase/firestore';
 import { useState, useEffect } from "react";
-import { FirebaseApp } from "firebase/app";
-import { link } from "fs";
 import EditDropdownTypeSheet from "@/components/questionTypes/editable/EditDropdownFromSheet";
-import { ParsedUrlQuery } from "querystring";
 
 const db = getFirestore(app);
 
@@ -57,27 +47,6 @@ export default function Edit() {
   }, [router]);
   // console.log("slug: " + slug);
 
-  // // Look for document
-  // const [value, loading, error, snapshot] = useDocumentData(doc(db, "forms", `${slug}`));
-  // if (!loading && (!value)) {
-  //   router.push("/admin");
-  // }
-
-  // const [questionContent, setQuestionContent] = useState(value?.questions);
-
-  // (async () => {
-  //   const docRef = doc(db, "forms", `${slug}`);
-  //   const docSnap = await getDoc(docRef);
-  //   console.log(`slug (${slug}) has doc?`, docSnap.exists());
-
-  //   // Redirect if DNE
-  //   if (!docSnap.exists()) {
-  //     // router.push("/admin");
-  //   } else {
-  //     setQuestionContent(docSnap.data().questions)
-  //     setFormData(docSnap.data());
-  //   }
-  // })();
 
   const updateContent = (i: number, content: question) => {
     let contentCopy = questionContent;
@@ -95,7 +64,6 @@ export default function Edit() {
   }
 
 
-  // const questions: Array<DocumentData> = value?.questions;
   const questions: Array<DocumentData> = questionContent;
   const questionSet = questions?.map((question: DocumentData, i: number) => {
     // Sort question type
@@ -125,7 +93,6 @@ export default function Edit() {
   return (
     <div className="text-black">
       <div>
-        {/* <h1>{value?.header}</h1> */}
         <h1>{formData?.header}</h1>
       </div>
       <div>
