@@ -96,12 +96,27 @@ export default function Edit() {
       <div>
         <h1>{formData?.header}</h1>
       </div>
-      <div>
+      <div className="m-5">
         {questionSet}
+        <div className="border-2 border-gray-900 rounded py-2 flex">
+          <svg
+					aria-hidden="true"
+					fill="none"
+					stroke="currentColor"
+					strokeWidth={1.5}
+					viewBox="0 0 24 24"
+					xmlns="http://www.w3.org/2000/svg"
+					className="ml-2 h-8 w-8 rounded pt-1 text-neutral-50 bg-gray-900 hover:bg-blue-600 hover:cursor-pointer"
+						>
+  					<path d="M12 4.5v15m7.5-7.5h-15" stroke-linecap="round" stroke-linejoin="round"/>
+				  </svg>
+          <h2 className="m-2 font-semibold">Add a question</h2>
+        </div>
       </div>
-      <div>
-        <button onClick={handleSave} className="bg-green-500, px-4 py-2">Save</button>
-        <button className="bg-rose-500">Cancel</button>
+      <div className="justify-center flex mb-5">
+        <button onClick={handleSave} className="rounded-md bg-green-500 px-7 py-2">Save</button>
+        <br className="m-2"/>
+        <button className="bg-rose-500 px-6 py-2 rounded-md">Cancel</button>
       </div>
     </div>
   )

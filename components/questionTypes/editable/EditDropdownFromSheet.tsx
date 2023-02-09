@@ -79,7 +79,7 @@ export default function EditDropdownTypeSheet({
 					strokeWidth={1.5}
 					viewBox="0 0 24 24"
 					xmlns="http://www.w3.org/2000/svg"
-					className="h-8 w-8 rounded pt-1 text-neutral-50 bg-gray-900 hover:bg-neutral-50 hover:text-gray-900 hover:cursor-pointer"
+					className="h-8 w-8 rounded pt-1 text-neutral-50 bg-gray-900 hover:bg-blue-600 hover:cursor-pointer"
 						>
   					<path stroke-linecap="round" stroke-linejoin="round" d="M19.5 12h-15" />
 
