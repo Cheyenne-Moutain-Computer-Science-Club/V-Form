@@ -8,10 +8,11 @@ import { signIn } from "@lib/auth";
 import { app } from '@lib/firebase';
 import { collection, query, where, getDocs, getFirestore, doc, setDoc, getDoc, DocumentData } from 'firebase/firestore';
 import DropdownTypeQuestion from "@/components/questionTypes/DropdownType";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { FirebaseApp } from "firebase/app";
 import { link } from "fs";
 import EditDropdownTypeSheet from "@/components/questionTypes/editable/EditDropdownFromSheet";
+import { ParsedUrlQuery } from "querystring";
 
 const db = getFirestore(app);
 
@@ -25,10 +26,35 @@ interface question {
 	placeholder: string;
 }
 
-export default function Poll() {
-  // Get URL slug
+const onMount = async (slug: any) => {
+  const docRef = doc(db, "forms", `${slug}`);
+    const docSnap = await getDoc(docRef);
+    console.log(`slug (${slug}) has doc?`, docSnap.exists());
+
+    // Redirect if DNE
+    if (!docSnap.exists()) {
+      // router.push("/admin");
+      return;
+    } else {
+      return docSnap.data();
+    }
+}
+
+export default function Edit() {
   const router = useRouter();
+  // Get URL slug
   const { slug } = router.query /*?? ""*/;
+
+  const [formData, setFormData] = useState(Object);
+  const [questionContent, setQuestionContent] = useState(Array<DocumentData>);
+
+  useEffect(() => {
+    (async () => {
+      const data = await onMount(slug);
+      setFormData(data);
+      setQuestionContent(data?.questions);
+    })();
+  }, [router]);
   // console.log("slug: " + slug);
 
   // // Look for document
@@ -38,25 +64,22 @@ export default function Poll() {
   // }
 
   // const [questionContent, setQuestionContent] = useState(value?.questions);
-  const [formData, setFormData] = useState(Object);
-  const [questionContent, setQuestionContent] = useState(Array<DocumentData>);
 
-  const docRef = doc(db, "forms", `${slug}`);
-  // const docSnap = await getDoc(docRef);
-  getDoc(docRef).then((docSnap) => {
-    console.log(`slug (${slug}) has doc?`, docSnap.exists());
+  // (async () => {
+  //   const docRef = doc(db, "forms", `${slug}`);
+  //   const docSnap = await getDoc(docRef);
+  //   console.log(`slug (${slug}) has doc?`, docSnap.exists());
 
-    // Redirect if DNE
-    if (!docSnap.exists()) {
-      router.push("/admin");
-    } else {
-      setQuestionContent(docSnap.data().questions)
-      setFormData(docSnap.data());
-    }
-  });
+  //   // Redirect if DNE
+  //   if (!docSnap.exists()) {
+  //     // router.push("/admin");
+  //   } else {
+  //     setQuestionContent(docSnap.data().questions)
+  //     setFormData(docSnap.data());
+  //   }
+  // })();
 
   const updateContent = (i: number, content: question) => {
-    console.log("Content state updated");
     let contentCopy = questionContent;
     contentCopy[i] = content;
     setQuestionContent(contentCopy);
@@ -65,6 +88,7 @@ export default function Poll() {
 
   // Database outgoing interaction
   const handleSave = async () => {
+    // TODO: remove blank lines
     console.log(questionContent);
     const docRef = doc(db, "forms", `${slug}`);
     await setDoc(docRef, {questions: questionContent}, {merge: true});
@@ -102,7 +126,7 @@ export default function Poll() {
     <div className="text-black">
       <div>
         {/* <h1>{value?.header}</h1> */}
-        <h1>{formData.header}</h1>
+        <h1>{formData?.header}</h1>
       </div>
       <div>
         {questionSet}
