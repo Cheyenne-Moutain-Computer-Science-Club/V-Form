@@ -1,5 +1,6 @@
 export interface Form {
 	header: string;
+	slug: string;
 	options: {
 		active: boolean;
 		endDate: Date;
@@ -16,4 +17,10 @@ export interface Question {
 	type: string;
 	required: boolean;
 	items: string[];
+}
+
+export interface whitelist {
+	name: string;
+	user: string;
+	emails: string[];
 }

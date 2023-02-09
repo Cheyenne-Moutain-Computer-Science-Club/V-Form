@@ -13,7 +13,7 @@ import {
 	addDoc,
 } from "firebase/firestore";
 import DropdownTypeQuestion from "@/components/questionTypes/DropdownType";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import Router from "next/router";
 import Footer from "@/components/footer";
 import MultipleChoiceTypeQuestion from "@/components/questionTypes/MultipleChoiceType";
@@ -36,6 +36,24 @@ export default function Form(
 		doc(firestore, `forms/${props.slug}`)
 	);
 	const [questionResponses, setQuestionResponses] = useState([""]);
+
+	useEffect(() => {
+		if (user)
+			getDocs(
+				query(
+					collection(firestore, "responses"),
+					where("form", "==", props.slug),
+					where("uid", "==", user?.uid)
+				)
+			).then((result) => {
+				if (result.docs.length > 0) {
+					Router.push({
+						pathname: "/responded",
+						query: { slug: props.slug },
+					});
+				}
+			});
+	}, [user]);
 
 	if (authLoading || dataLoading) {
 		return (
@@ -82,21 +100,6 @@ export default function Form(
 			</div>
 		);
 	}
-
-	getDocs(
-		query(
-			collection(firestore, "responses"),
-			where("form", "==", props.slug),
-			where("uid", "==", user?.uid)
-		)
-	).then((result) => {
-		if (result.docs.length > 0) {
-			Router.push({
-				pathname: "/responded",
-				query: { slug: props.slug },
-			});
-		}
-	});
 
 	const questionsData = value?.questions;
 	const header = value?.header;
