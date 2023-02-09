@@ -44,8 +44,8 @@ export default function Poll() {
   const docRef = doc(db, "forms", `${slug}`);
   // const docSnap = await getDoc(docRef);
   getDoc(docRef).then((docSnap) => {
-    console.log(docSnap);
-    console.warn(docSnap.exists());
+    console.log(`slug (${slug}) has doc?`, docSnap.exists());
+
     // Redirect if DNE
     if (!docSnap.exists()) {
       router.push("/admin");
