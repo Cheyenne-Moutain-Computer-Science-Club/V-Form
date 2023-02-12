@@ -64,6 +64,21 @@ export default function Edit() {
     await setDoc(docRef, {questions: questionContent}, {merge: true});
   }
 
+  const addQuestion = () => {
+    let contentCopy = questionContent;
+    const newQuestion: question = {
+      title: "New Question",
+      description: "New Description",
+      required: false,
+      type: "dropdown",
+      items: ["Item1", "Item2"],
+      placeholder: "Placeholder"
+    }
+    contentCopy.push(newQuestion);
+    setQuestionContent(contentCopy);
+    console.log(questionContent);
+  }
+
 
   const questions: Array<DocumentData> = questionContent;
   const questionSet = questions?.map((question: DocumentData, i: number) => {
@@ -106,9 +121,10 @@ export default function Edit() {
 					strokeWidth={1.5}
 					viewBox="0 0 24 24"
 					xmlns="http://www.w3.org/2000/svg"
+          onClick={addQuestion}
 					className="ml-2 h-8 w-8 rounded pt-1 text-neutral-50 bg-gray-900 hover:bg-blue-600 hover:cursor-pointer"
 						>
-  					<path d="M12 4.5v15m7.5-7.5h-15" stroke-linecap="round" stroke-linejoin="round"/>
+  					<path d="M12 4.5v15m7.5-7.5h-15" strokeLinecap="round" strokeLinejoin="round"/>
 				  </svg>
           <h2 className="m-2 font-semibold">Add a question</h2>
         </div>
