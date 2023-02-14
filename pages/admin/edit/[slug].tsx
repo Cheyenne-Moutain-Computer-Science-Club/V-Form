@@ -3,6 +3,7 @@ import { app } from '@lib/firebase';
 import { getFirestore, doc, setDoc, getDoc, DocumentData } from 'firebase/firestore';
 import { useState, useEffect } from "react";
 import EditDropdownTypeSheet from "@/components/questionTypes/editable/EditDropdownFromSheet";
+import { v4 as uuidv4 } from "uuid";
 
 const db = getFirestore(app);
 
@@ -103,7 +104,7 @@ export default function Edit() {
                 remove={removeQuestion}
                 description={question.description} 
                 placeholder={question.placeholder}
-                key={i}
+                key={uuidv4()}
               />
           </div>
         );

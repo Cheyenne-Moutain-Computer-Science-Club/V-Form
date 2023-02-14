@@ -13,7 +13,7 @@ import {
 import Footer from "@/components/footer";
 import { signIn } from "@/lib/auth";
 import { useCollectionDataOnce } from "react-firebase-hooks/firestore";
-import { Form } from "@/lib/types";
+import { Form } from "@/lib/types";``
 import FormSplash from "@/components/creation-tools/FormSplash";
 import Link from "next/link";
 import AdminMenu from "@/components/creation-tools/AdminMenu";
