@@ -3,6 +3,7 @@ import { app } from '@lib/firebase';
 import { getFirestore, doc, setDoc, getDoc, DocumentData } from 'firebase/firestore';
 import { useState, useEffect } from "react";
 import EditDropdownTypeSheet from "@/components/questionTypes/editable/EditDropdownFromSheet";
+import { v4 as uuidv4 } from "uuid";
 
 const db = getFirestore(app);
 
@@ -19,7 +20,7 @@ interface question {
 const onMount = async (slug: any) => {
   const docRef = doc(db, "forms", `${slug}`);
     const docSnap = await getDoc(docRef);
-    console.log(`slug (${slug}) has doc?`, docSnap.exists());
+    // console.log(`slug (${slug}) has doc?`, docSnap.exists());
 
     // Redirect if DNE
     if (!docSnap.exists()) {
@@ -58,14 +59,37 @@ export default function Edit() {
   // Database outgoing interaction
   const handleSave = async () => {
     // TODO: remove blank lines
-    console.log(questionContent);
+    // TODO: confirmation
+    // console.log(questionContent);
     const docRef = doc(db, "forms", `${slug}`);
     await setDoc(docRef, {questions: questionContent}, {merge: true});
   }
 
+  const addQuestion = () => {
+    // let contentCopy = questionContent;
+    const newQuestion: question = {
+      title: "New Question",
+      description: "New Description",
+      required: false,
+      type: "dropdown",
+      items: ["Item1", "Item2"],
+      placeholder: "Placeholder"
+    }
+    // contentCopy.push(newQuestion);
+    const newContent = [...questionContent, newQuestion];
+    setQuestionContent(newContent);
+    console.log(questionContent);
+  }
 
-  const questions: Array<DocumentData> = questionContent;
-  const questionSet = questions?.map((question: DocumentData, i: number) => {
+  const removeQuestion = (i: number) => {
+    let contentCopy = [...questionContent];
+    contentCopy.splice(i, 1);
+    setQuestionContent(contentCopy);
+    console.log(questionContent);
+  }
+
+  
+  const questionSet = questionContent?.map((question: DocumentData, i: number) => {
     // Sort question type
     switch (question.type) {
       case ("dropdown"):
@@ -77,9 +101,10 @@ export default function Edit() {
                 required={question.required} 
                 id={i} 
                 update={updateContent} 
+                remove={removeQuestion}
                 description={question.description} 
                 placeholder={question.placeholder}
-                key={i}
+                key={uuidv4()}
               />
           </div>
         );
@@ -95,11 +120,28 @@ export default function Edit() {
       <div>
         <h1>{formData?.header}</h1>
       </div>
-      <div>
+      <div className="m-5">
         {questionSet}
+        <div className="border-2 border-gray-900 rounded py-2 flex">
+          <svg
+					aria-hidden="true"
+					fill="none"
+					stroke="currentColor"
+					strokeWidth={1.5}
+					viewBox="0 0 24 24"
+					xmlns="http://www.w3.org/2000/svg"
+          onClick={addQuestion}
+					className="ml-2 h-8 w-8 rounded pt-1 text-neutral-50 bg-gray-900 hover:bg-blue-600 hover:cursor-pointer"
+						>
+  					<path d="M12 4.5v15m7.5-7.5h-15" strokeLinecap="round" strokeLinejoin="round"/>
+				  </svg>
+          <h2 className="m-2 font-semibold">Add a question</h2>
+        </div>
       </div>
-      <div>
-        <button onClick={handleSave} className="bg-green-500, px-4 py-2">Save</button>
+      <div className="justify-center flex mb-5">
+        <button onClick={handleSave} className="rounded-md bg-green-500 px-7 py-2">Save</button>
+        <br className="m-2"/>
+        <button className="bg-rose-500 px-6 py-2 rounded-md">Cancel</button>
       </div>
     </div>
   )
