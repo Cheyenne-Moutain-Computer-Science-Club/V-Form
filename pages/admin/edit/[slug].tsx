@@ -80,6 +80,13 @@ export default function Edit() {
     console.log(questionContent);
   }
 
+  const removeQuestion = (i: number) => {
+    let contentCopy = [...questionContent];
+    contentCopy.splice(i, 1);
+    setQuestionContent(contentCopy);
+    console.log(questionContent);
+  }
+
   
   const questionSet = questionContent?.map((question: DocumentData, i: number) => {
     // Sort question type
@@ -93,6 +100,7 @@ export default function Edit() {
                 required={question.required} 
                 id={i} 
                 update={updateContent} 
+                remove={removeQuestion}
                 description={question.description} 
                 placeholder={question.placeholder}
                 key={i}

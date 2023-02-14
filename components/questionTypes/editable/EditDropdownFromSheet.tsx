@@ -15,6 +15,7 @@ export default function EditDropdownTypeSheet({
 	required,
 	id,
 	update,
+	remove,
 	description,
 	placeholder,
 }: {
@@ -23,6 +24,7 @@ export default function EditDropdownTypeSheet({
 	required: boolean;
 	id: number;
 	update: (id: number, response: question) => void;
+	remove: (id: number) => void;
 	description: string;
 	placeholder: string;
 }) {
@@ -80,6 +82,7 @@ export default function EditDropdownTypeSheet({
 					viewBox="0 0 24 24"
 					xmlns="http://www.w3.org/2000/svg"
 					className="h-8 w-8 rounded pt-1 text-neutral-50 bg-gray-900 hover:bg-blue-600 hover:cursor-pointer"
+					onClick={() => remove(id)}
 						>
   					<path strokeLinecap="round" strokeLinejoin="round" d="M19.5 12h-15" />
 
