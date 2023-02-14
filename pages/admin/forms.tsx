@@ -6,17 +6,13 @@ import {
 	query,
 	where,
 	getDocs,
-	getFirestore,
 	doc,
 	setDoc,
 } from "firebase/firestore";
 import Footer from "@/components/footer";
 import { signIn } from "@/lib/auth";
-import { useCollectionDataOnce } from "react-firebase-hooks/firestore";
 import { Form } from "@/lib/types";
 import FormSplash from "@/components/creation-tools/FormSplash";
-import Link from "next/link";
-import AdminMenu from "@/components/creation-tools/AdminMenu";
 import { useRouter } from "next/router";
 import { v4 as uuidv4 } from "uuid";
 

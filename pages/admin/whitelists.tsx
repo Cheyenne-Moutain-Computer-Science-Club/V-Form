@@ -13,9 +13,7 @@ import {
 import { QuerySnapshot } from "firebase/firestore";
 import Footer from "@/components/footer";
 import { signIn } from "@/lib/auth";
-import Link from "next/link";
 import WhitelistSplash from "@/components/creation-tools/WhitelistSplash";
-import Router from "next/router";
 
 export default function Whitelists() {
 	const [user, userLoading, userError] = useAuthState(auth);
