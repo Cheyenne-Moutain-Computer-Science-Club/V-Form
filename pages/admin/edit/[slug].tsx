@@ -65,7 +65,7 @@ export default function Edit() {
   }
 
   const addQuestion = () => {
-    let contentCopy = questionContent;
+    // let contentCopy = questionContent;
     const newQuestion: question = {
       title: "New Question",
       description: "New Description",
@@ -74,14 +74,14 @@ export default function Edit() {
       items: ["Item1", "Item2"],
       placeholder: "Placeholder"
     }
-    contentCopy.push(newQuestion);
-    setQuestionContent(contentCopy);
+    // contentCopy.push(newQuestion);
+    const newContent = [...questionContent, newQuestion];
+    setQuestionContent(newContent);
     console.log(questionContent);
   }
 
-
-  const questions: Array<DocumentData> = questionContent;
-  const questionSet = questions?.map((question: DocumentData, i: number) => {
+  
+  const questionSet = questionContent?.map((question: DocumentData, i: number) => {
     // Sort question type
     switch (question.type) {
       case ("dropdown"):
