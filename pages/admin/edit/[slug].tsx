@@ -2,8 +2,9 @@ import { useRouter } from "next/router";
 import { app } from '@lib/firebase';
 import { getFirestore, doc, setDoc, getDoc, DocumentData } from 'firebase/firestore';
 import { useState, useEffect } from "react";
-import EditDropdownTypeSheet from "@/components/questionTypes/editable/EditDropdownFromSheet";
 import { v4 as uuidv4 } from "uuid";
+import EditDropdownTypeSheet from "@/components/questionTypes/editable/EditDropdownFromSheet";
+import Toggle from "@/components/toggle";
 
 const db = getFirestore(app);
 
@@ -117,10 +118,23 @@ export default function Edit() {
 
   return (
     <div className="text-black">
-      <div>
-        <h1>{formData?.header}</h1>
+      <div className="m-5">
+        <h1 className="font-semibold flex justify-center text-3xl">{formData?.header}</h1>
       </div>
       <div className="m-5">
+        <div className="border-2 border-gray-900">
+          <h2 className="flex text-2xl justify-center m-2 font-semibold">Form Settings</h2>
+          <hr className="bg-neutral-200 h-1 rounded mx-5 mb-3"/>
+          <div className="m-10 space-y-5">
+            <Toggle/>
+            <div>
+              <h3 className="font-semibold underline">Whitelists:</h3>
+              <div>
+                
+              </div>
+            </div>
+          </div>
+        </div>
         {questionSet}
         <div className="border-2 border-gray-900 rounded py-2 flex">
           <svg
@@ -139,9 +153,9 @@ export default function Edit() {
         </div>
       </div>
       <div className="justify-center flex mb-5">
-        <button onClick={handleSave} className="rounded-md bg-green-500 px-7 py-2">Save</button>
+        <button onClick={handleSave} className="rounded-md bg-green-500 px-7 py-2 hover:bg-green-400">Save</button>
         <br className="m-2"/>
-        <button className="bg-rose-500 px-6 py-2 rounded-md">Cancel</button>
+        <button className="bg-rose-500 px-6 py-2 rounded-md hover:bg-rose-400">Cancel</button>
       </div>
     </div>
   )
