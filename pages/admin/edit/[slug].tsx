@@ -1,10 +1,11 @@
 import { useRouter } from "next/router";
 import { app } from '@lib/firebase';
-import { getFirestore, doc, setDoc, getDoc, DocumentData } from 'firebase/firestore';
+import { collection, getFirestore, doc, setDoc, getDoc, getDocs, DocumentData } from 'firebase/firestore';
 import { useState, useEffect } from "react";
 import { v4 as uuidv4 } from "uuid";
 import EditDropdownTypeSheet from "@/components/questionTypes/editable/EditDropdownFromSheet";
 import Toggle from "@/components/toggle";
+import Checkbox from "@/components/inputs/checkbox";
 
 const db = getFirestore(app);
 
@@ -39,6 +40,7 @@ export default function Edit() {
 
   const [formData, setFormData] = useState(Object);
   const [questionContent, setQuestionContent] = useState(Array<DocumentData>);
+  const [options, setOptions] = useState(Array<DocumentData>);
 
   useEffect(() => {
     (async () => {
@@ -88,7 +90,6 @@ export default function Edit() {
     setQuestionContent(contentCopy);
     console.log(questionContent);
   }
-
   
   const questionSet = questionContent?.map((question: DocumentData, i: number) => {
     // Sort question type
@@ -116,6 +117,28 @@ export default function Edit() {
     }
   });
 
+
+  // Options things
+    // On mount, get whitelist
+    useEffect(() => {
+      (async () => {
+        const docSnap = await getDocs(collection(db, "whitelists"));
+        setOptions(docSnap.docs);
+      })();
+    }, []);
+    // const whitelistSnapshot = (async () => {
+    //   const docSnap = await getDocs(collection(db, "whitelist"));
+    //   return docSnap;
+    // })();
+    const whitelistSet = options.map((list: DocumentData, i: number) => {
+      return (
+        <div>
+          <Checkbox/>
+          <label>{list.data().name}</label>
+        </div>
+      );
+    });
+
   return (
     <div className="text-black">
       <div className="m-5">
@@ -126,11 +149,11 @@ export default function Edit() {
           <h2 className="flex text-2xl justify-center m-2 font-semibold">Form Settings</h2>
           <hr className="bg-neutral-200 h-1 rounded mx-5 mb-3"/>
           <div className="m-10 space-y-5">
-            <Toggle/>
+            <Toggle option={"Active"}/>
             <div>
               <h3 className="font-semibold underline">Whitelists:</h3>
               <div>
-                
+                {whitelistSet}
               </div>
             </div>
           </div>
