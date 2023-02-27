@@ -11,6 +11,8 @@ import {
 	where,
 	getDocs,
 	addDoc,
+	getDoc,
+	DocumentSnapshot,
 } from "firebase/firestore";
 import DropdownTypeQuestion from "@/components/questionTypes/DropdownType";
 import { useEffect, useState } from "react";
@@ -18,6 +20,7 @@ import Router from "next/router";
 import Footer from "@/components/footer";
 import MultipleChoiceTypeQuestion from "@/components/questionTypes/MultipleChoiceType";
 import MultipleSelectTypeQuestion from "@/components/questionTypes/MultipleSelectType";
+import { whitelist } from "@/lib/types";
 
 interface question {
 	title: string;
@@ -54,6 +57,28 @@ export default function Form(
 				}
 			});
 	}, [user]);
+
+	useEffect(() => {
+		if (user && value) {
+			getDoc(value.options.whitelist).then((result) => {
+				console.log(
+					value.options.whitelist,
+					result,
+					result.exists(),
+					result.data()
+				);
+				if (result.exists() && user.email) {
+					let data = result.data() as whitelist;
+					if (!data.emails.includes(user.email)) {
+						Router.push({
+							pathname: "/not-allowed",
+							query: { slug: props.slug },
+						});
+					}
+				}
+			});
+		}
+	}, [user, value]);
 
 	if (authLoading || dataLoading) {
 		return (

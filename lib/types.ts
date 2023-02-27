@@ -1,3 +1,5 @@
+import { DocumentReference } from "firebase/firestore";
+
 export interface Form {
 	header: string;
 	slug: string;
@@ -6,6 +8,7 @@ export interface Form {
 		endDate: Date;
 		submits: number;
 		user: string;
+		whitelists: DocumentReference<whitelist>;
 	};
 	questions: Question[];
 }
