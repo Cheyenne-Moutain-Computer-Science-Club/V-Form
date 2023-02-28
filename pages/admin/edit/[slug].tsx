@@ -5,7 +5,6 @@ import { useState, useEffect } from "react";
 import { v4 as uuidv4 } from "uuid";
 import EditDropdownTypeSheet from "@/components/questionTypes/editable/EditDropdownFromSheet";
 import Toggle from "@/components/toggle";
-import Checkbox from "@/components/inputs/checkbox";
 
 const db = getFirestore(app);
 
@@ -17,6 +16,12 @@ interface question {
 	type: string;
 	items: string[];
 	placeholder: string;
+}
+
+interface options {
+  active: boolean;
+  whitelists: string[]; // Array of strings with whitelist ids
+  endDate: Date;
 }
 
 const onMount = async (slug: any) => {
@@ -40,13 +45,26 @@ export default function Edit() {
 
   const [formData, setFormData] = useState(Object);
   const [questionContent, setQuestionContent] = useState(Array<DocumentData>);
-  const [options, setOptions] = useState(Array<DocumentData>);
+  const [whitelists, setWhitelists] = useState(Array<DocumentData>);
+  const [formOptions, setFormOptions] = useState(Object);
+  // Checkbox state
+  const [checked, setChecked] = useState(Array<Boolean>);
 
+
+  // Anything depending on slug should be in this useEffect
   useEffect(() => {
     (async () => {
+      // Get document based on URL slug
       const data = await onMount(slug);
       setFormData(data);
+      // Set questions
       setQuestionContent(data?.questions);
+
+      // Prepare whitelist states
+      const activeWhitelists = data?.options?.whitelists;
+      /////////////
+
+
     })();
   }, [router]);
   // console.log("slug: " + slug);
@@ -119,21 +137,32 @@ export default function Edit() {
 
 
   // Options things
-    // On mount, get whitelist
+    // Whitelist option preparation
+    // This useEffect only runs on mount
     useEffect(() => {
       (async () => {
+        // Get all possible whitelists
         const docSnap = await getDocs(collection(db, "whitelists"));
-        setOptions(docSnap.docs);
+        setWhitelists(docSnap.docs);
+
+        // Get active whitelists for form
+
+        
       })();
     }, []);
     // const whitelistSnapshot = (async () => {
     //   const docSnap = await getDocs(collection(db, "whitelist"));
     //   return docSnap;
     // })();
-    const whitelistSet = options.map((list: DocumentData, i: number) => {
+    const whitelistSet = whitelists.map((list: DocumentData, i: number) => {
       return (
         <div>
-          <Checkbox/>
+          <input
+									type="checkbox"
+									value={"grrrr"}
+									name={"rr"}
+									className="checked:bg-accent h-4 w-4 appearance-none rounded border-2 border-gray-900 bg-neutral-50 focus:ring-0"
+								/>
           <label>{list.data().name}</label>
         </div>
       );
@@ -149,7 +178,15 @@ export default function Edit() {
           <h2 className="flex text-2xl justify-center m-2 font-semibold">Form Settings</h2>
           <hr className="bg-neutral-200 h-1 rounded mx-5 mb-3"/>
           <div className="m-10 space-y-5">
-            <Toggle option={"Active"}/>
+            {/* <Toggle option={"Active"}/> */}
+              <label className="relative flex justify-start items-center group p-2 text-xl">
+                <input 
+                type="checkbox" 
+                checked={}
+                className="absolute left-1/2 -translate-x-1/2 w-full h-full peer appearance-none rounded-md" />
+                <span className="w-16 h-10 flex items-center flex-shrink-0 ml-4 p-1 bg-gray-300 rounded-full duration-300 ease-in-out peer-checked:bg-black after:w-8 after:h-8 after:bg-white after:rounded-full after:shadow-md after:duration-300 peer-checked:after:translate-x-6"></span>
+                <span className="ml-5">Active</span>
+              </label>
             <div>
               <h3 className="font-semibold underline">Whitelists:</h3>
               <div>
