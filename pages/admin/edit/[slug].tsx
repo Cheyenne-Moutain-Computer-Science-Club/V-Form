@@ -64,6 +64,7 @@ export default function Edit() {
       const activeWhitelists = data?.options?.whitelists;
       let checkedPop = Array(whitelists.length);
       whitelists.map((list, i) => {
+        console.log("mapping: " + i)
         if (activeWhitelists.includes(whitelists[i])) {
           checkedPop[i] = true;
         } else {
@@ -163,6 +164,13 @@ export default function Edit() {
         
       })();
     }, []);
+
+    const onChangeWhitelist = (i: number) => {
+      let checkedCopy = [...checked];
+      checkedCopy[i] = !checkedCopy[i];
+      setChecked(checkedCopy);
+      console.log(checked);
+    }
     // const whitelistSnapshot = (async () => {
     //   const docSnap = await getDocs(collection(db, "whitelist"));
     //   return docSnap;
@@ -175,6 +183,8 @@ export default function Edit() {
                     type="checkbox"
                     value={"grrrr"}
                     name={"rr"}
+                    checked={!checked[i]}
+                    onChange={() => onChangeWhitelist(i)}
                     className="checked:bg-accent h-4 w-4 appearance-none rounded border-2 border-gray-900 bg-neutral-50 focus:ring-0"
                   />
           {list[1]}</label>
