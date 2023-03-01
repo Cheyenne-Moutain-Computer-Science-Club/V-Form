@@ -45,7 +45,7 @@ export default function Edit() {
 
   const [formData, setFormData] = useState(Object);
   const [questionContent, setQuestionContent] = useState(Array<DocumentData>);
-  const [whitelists, setWhitelists] = useState(Array<DocumentData>);
+  const [whitelists, setWhitelists] = useState(Array<[string, string][]>);
   const [formOptions, setFormOptions] = useState(Object);
   // Checkbox state
   const [checked, setChecked] = useState(Array<Boolean>);
@@ -143,9 +143,14 @@ export default function Edit() {
       (async () => {
         // Get all possible whitelists
         const docSnap = await getDocs(collection(db, "whitelists"));
-        setWhitelists(docSnap.docs);
-
-        // Get active whitelists for form
+        // setWhitelists(docSnap.docs);
+        // An array of tuples [[id, name]...]
+        let whitelistId_Name = Array(docSnap.docs.length);
+        docSnap.docs.map((doc, i) => {
+          const pair: readonly [id: String, name: String] = [doc.id, doc.data().name];
+          whitelistId_Name[i] = pair;
+        });
+        setWhitelists(whitelistId_Name);
 
         
       })();
@@ -154,7 +159,7 @@ export default function Edit() {
     //   const docSnap = await getDocs(collection(db, "whitelist"));
     //   return docSnap;
     // })();
-    const whitelistSet = whitelists.map((list: DocumentData, i: number) => {
+    const whitelistSet = whitelists.map((list, i) => {
       return (
         <div>
           <input
@@ -163,7 +168,7 @@ export default function Edit() {
 									name={"rr"}
 									className="checked:bg-accent h-4 w-4 appearance-none rounded border-2 border-gray-900 bg-neutral-50 focus:ring-0"
 								/>
-          <label>{list.data().name}</label>
+          <label className="ml-1">{list[1]}</label>
         </div>
       );
     });
@@ -182,7 +187,7 @@ export default function Edit() {
               <label className="relative flex justify-start items-center group p-2 text-xl">
                 <input 
                 type="checkbox" 
-                checked={}
+                // checked={}
                 className="absolute left-1/2 -translate-x-1/2 w-full h-full peer appearance-none rounded-md" />
                 <span className="w-16 h-10 flex items-center flex-shrink-0 ml-4 p-1 bg-gray-300 rounded-full duration-300 ease-in-out peer-checked:bg-black after:w-8 after:h-8 after:bg-white after:rounded-full after:shadow-md after:duration-300 peer-checked:after:translate-x-6"></span>
                 <span className="ml-5">Active</span>
