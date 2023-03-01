@@ -62,7 +62,15 @@ export default function Edit() {
 
       // Prepare whitelist states
       const activeWhitelists = data?.options?.whitelists;
-      /////////////
+      let checkedPop = Array(whitelists.length);
+      whitelists.map((list, i) => {
+        if (activeWhitelists.includes(whitelists[i])) {
+          checkedPop[i] = true;
+        } else {
+          checkedPop[i] = false;
+        }
+      });
+      setChecked(checkedPop);
 
 
     })();
@@ -162,13 +170,14 @@ export default function Edit() {
     const whitelistSet = whitelists.map((list, i) => {
       return (
         <div>
-          <input
-									type="checkbox"
-									value={"grrrr"}
-									name={"rr"}
-									className="checked:bg-accent h-4 w-4 appearance-none rounded border-2 border-gray-900 bg-neutral-50 focus:ring-0"
-								/>
-          <label className="ml-1">{list[1]}</label>
+          <label className="ml-1">
+            <input
+                    type="checkbox"
+                    value={"grrrr"}
+                    name={"rr"}
+                    className="checked:bg-accent h-4 w-4 appearance-none rounded border-2 border-gray-900 bg-neutral-50 focus:ring-0"
+                  />
+          {list[1]}</label>
         </div>
       );
     });
