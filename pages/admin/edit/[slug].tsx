@@ -60,10 +60,11 @@ export default function Edit() {
       // Set questions
       setQuestionContent(data?.questions);
 
+      // ---------
       // Prepare whitelist states
       const activeWhitelists = data?.options?.whitelists;
       let checkedPop = Array(whitelists.length);
-      whitelists.map((list, i) => {
+      whitelists.map((_, i) => {
         console.log("mapping: " + i)
         if (activeWhitelists.includes(whitelists[i])) {
           checkedPop[i] = true;
@@ -72,11 +73,30 @@ export default function Edit() {
         }
       });
       setChecked(checkedPop);
-
+      // ---------
 
     })();
   }, [router]);
   // console.log("slug: " + slug);
+
+  // Whitelist option preparation
+  // This useEffect only runs on mount
+  useEffect(() => {
+    (async () => {
+      // Get all possible whitelists
+      const docSnap = await getDocs(collection(db, "whitelists"));
+      // setWhitelists(docSnap.docs);
+      // An array of tuples [[id, name]...]
+      let whitelistId_Name = Array(docSnap.docs.length);
+      docSnap.docs.map((doc, i) => {
+        const pair: readonly [id: String, name: String] = [doc.id, doc.data().name];
+        whitelistId_Name[i] = pair;
+      });
+      setWhitelists(whitelistId_Name);
+
+      
+    })();
+  }, []);
 
 
   const updateContent = (i: number, content: question) => {
@@ -146,24 +166,6 @@ export default function Edit() {
 
 
   // Options things
-    // Whitelist option preparation
-    // This useEffect only runs on mount
-    useEffect(() => {
-      (async () => {
-        // Get all possible whitelists
-        const docSnap = await getDocs(collection(db, "whitelists"));
-        // setWhitelists(docSnap.docs);
-        // An array of tuples [[id, name]...]
-        let whitelistId_Name = Array(docSnap.docs.length);
-        docSnap.docs.map((doc, i) => {
-          const pair: readonly [id: String, name: String] = [doc.id, doc.data().name];
-          whitelistId_Name[i] = pair;
-        });
-        setWhitelists(whitelistId_Name);
-
-        
-      })();
-    }, []);
 
     const onChangeWhitelist = (i: number) => {
       let checkedCopy = [...checked];
