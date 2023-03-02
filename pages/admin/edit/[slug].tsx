@@ -212,8 +212,6 @@ export default function Edit() {
         <label className="ml-1">
           <input
                   type="checkbox"
-                  value={"grrrr"}
-                  name={"rr"}
                   // TODO: see if a better solution is available here
                   checked={!!checked[i]}
                   onChange={() => onChangeWhitelist(i)}
