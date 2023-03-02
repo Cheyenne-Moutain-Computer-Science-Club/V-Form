@@ -80,12 +80,12 @@ export default function Edit() {
       // activeWhitelists: Currently set whitelists from DB
       const activeWhitelists = data?.options?.whitelists;
       // allWhitelists: All possible whitelists from DB
-      const allWhitelists = whitelistAll();
+      const allWhitelists = await whitelistAll();
 
-      let checkedPop = Array((await allWhitelists).length);
+      let checkedPop = Array(allWhitelists.length);
       checkedPop.map((_, i) => {
         console.log("mapping: " + i)
-        if (activeWhitelists.includes(whitelists[i])) {
+        if (activeWhitelists.includes(allWhitelists[i])) {
           checkedPop[i] = true;
         } else {
           checkedPop[i] = false;
