@@ -78,14 +78,17 @@ export default function Edit() {
       // ---------
       // Prepare whitelist states
       // activeWhitelists: Currently set whitelists from DB
-      const activeWhitelists = data?.options?.whitelists;
+      const activeWhitelists = data?.options?.whitelist;
       // allWhitelists: All possible whitelists from DB
       const allWhitelists = await whitelistAll();
 
       let checkedPop = Array(allWhitelists.length);
-      checkedPop.map((_, i) => {
-        console.log("mapping: " + i)
-        if (activeWhitelists.includes(allWhitelists[i])) {
+      // console.log(allWhitelists);
+      // console.log(activeWhitelists);
+      allWhitelists.map((_, i) => {
+        // console.log("mapping: " + i)
+        // console.log(activeWhitelists);
+        if (activeWhitelists?.includes(allWhitelists[i][0])) {
           checkedPop[i] = true;
         } else {
           checkedPop[i] = false;
@@ -184,7 +187,8 @@ export default function Edit() {
                     type="checkbox"
                     value={"grrrr"}
                     name={"rr"}
-                    checked={!checked[i]}
+                    // TODO: see if a better solution is available here
+                    checked={!!checked[i]}
                     onChange={() => onChangeWhitelist(i)}
                     className="checked:bg-accent h-4 w-4 appearance-none rounded border-2 border-gray-900 bg-neutral-50 focus:ring-0"
                   />
