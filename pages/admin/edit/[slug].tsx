@@ -20,7 +20,7 @@ interface question {
 
 interface options {
   active: boolean;
-  whitelists: string[]; // Array of strings with whitelist ids
+  whitelist: string[]; // Array of strings with whitelist ids
   endDate: Date;
 }
 
@@ -46,7 +46,7 @@ export default function Edit() {
   const [formData, setFormData] = useState(Object);
   const [questionContent, setQuestionContent] = useState(Array<DocumentData>);
   const [whitelists, setWhitelists] = useState(Array<[string, string][]>);
-  const [formOptions, setFormOptions] = useState(Object);
+  // const [formOptions, setFormOptions] = useState(Object);
   // Checkbox state
   const [checked, setChecked] = useState(Array<Boolean>);
 
@@ -66,7 +66,7 @@ export default function Edit() {
     return whitelistId_Name;
   };
 
-  // Anything depending on slug should be in this useEffect
+  // Runs on mount & slug change
   useEffect(() => {
     (async () => {
       // Get document based on URL slug
@@ -108,13 +108,33 @@ export default function Edit() {
     // console.log(questionContent);
   }
 
+  // Parse options to be saved to DB
+  const prepareOptions = (): options => {
+    // Whitelists
+    let activeWhitelists = Array<string>();
+    checked.map((_, i) => {
+      if (checked[i]) {
+        activeWhitelists.push(whitelists[i][0].toString());
+      }
+    });
+
+    const finalOptions: options = {
+      active: true,
+      whitelist: activeWhitelists,
+      endDate: new Date("2024-03-25T12:00:00-06:30")
+    }
+    return finalOptions;
+  }
+
   // Database outgoing interaction
   const handleSave = async () => {
     // TODO: remove blank lines
     // TODO: confirmation
     // console.log(questionContent);
+    const options = prepareOptions();
+
     const docRef = doc(db, "forms", `${slug}`);
-    await setDoc(docRef, {questions: questionContent}, {merge: true});
+    await setDoc(docRef, {questions: questionContent, options: options}, {merge: true});
   }
 
   const addQuestion = () => {
@@ -168,34 +188,41 @@ export default function Edit() {
 
 
   // Options things
+  // const updateOptions = (option: number) => {
+  //   let optionsCopy = formOptions;
+  //   switch (option) {
+  //     case (2):
+  //       optionsCopy.whitelist = 
+  //   }
+  // }
 
-    const onChangeWhitelist = (i: number) => {
-      let checkedCopy = [...checked];
-      checkedCopy[i] = !checkedCopy[i];
-      setChecked(checkedCopy);
-      console.log(checked);
-    }
-    // const whitelistSnapshot = (async () => {
-    //   const docSnap = await getDocs(collection(db, "whitelist"));
-    //   return docSnap;
-    // })();
-    const whitelistSet = whitelists.map((list, i) => {
-      return (
-        <div>
-          <label className="ml-1">
-            <input
-                    type="checkbox"
-                    value={"grrrr"}
-                    name={"rr"}
-                    // TODO: see if a better solution is available here
-                    checked={!!checked[i]}
-                    onChange={() => onChangeWhitelist(i)}
-                    className="checked:bg-accent h-4 w-4 appearance-none rounded border-2 border-gray-900 bg-neutral-50 focus:ring-0"
-                  />
-          {list[1]}</label>
-        </div>
-      );
-    });
+  const onChangeWhitelist = (i: number) => {
+    let checkedCopy = [...checked];
+    checkedCopy[i] = !checkedCopy[i];
+    setChecked(checkedCopy);
+    // console.log(checked);
+  }
+  // const whitelistSnapshot = (async () => {
+  //   const docSnap = await getDocs(collection(db, "whitelist"));
+  //   return docSnap;
+  // })();
+  const whitelistSet = whitelists.map((list, i) => {
+    return (
+      <div>
+        <label className="ml-1">
+          <input
+                  type="checkbox"
+                  value={"grrrr"}
+                  name={"rr"}
+                  // TODO: see if a better solution is available here
+                  checked={!!checked[i]}
+                  onChange={() => onChangeWhitelist(i)}
+                  className="checked:bg-accent h-4 w-4 appearance-none rounded border-2 border-gray-900 bg-neutral-50 focus:ring-0"
+                />
+        {list[1]}</label>
+      </div>
+    );
+  });
 
   return (
     <div className="text-black">
