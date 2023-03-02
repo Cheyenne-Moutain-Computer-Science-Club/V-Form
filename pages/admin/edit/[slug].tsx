@@ -51,6 +51,21 @@ export default function Edit() {
   const [checked, setChecked] = useState(Array<Boolean>);
 
 
+  // Whitelist option preparation
+  const whitelistAll = async () => {
+    // Get all possible whitelists
+    const docSnap = await getDocs(collection(db, "whitelists"));
+    // setWhitelists(docSnap.docs);
+    // An array of tuples [[id, name]...]
+    let whitelistId_Name = Array(docSnap.docs.length);
+    docSnap.docs.map((doc, i) => {
+      const pair: readonly [id: String, name: String] = [doc.id, doc.data().name];
+      whitelistId_Name[i] = pair;
+    });
+    setWhitelists(whitelistId_Name);
+    return whitelistId_Name;
+  };
+
   // Anything depending on slug should be in this useEffect
   useEffect(() => {
     (async () => {
@@ -62,9 +77,13 @@ export default function Edit() {
 
       // ---------
       // Prepare whitelist states
+      // activeWhitelists: Currently set whitelists from DB
       const activeWhitelists = data?.options?.whitelists;
-      let checkedPop = Array(whitelists.length);
-      whitelists.map((_, i) => {
+      // allWhitelists: All possible whitelists from DB
+      const allWhitelists = whitelistAll();
+
+      let checkedPop = Array((await allWhitelists).length);
+      checkedPop.map((_, i) => {
         console.log("mapping: " + i)
         if (activeWhitelists.includes(whitelists[i])) {
           checkedPop[i] = true;
@@ -73,30 +92,10 @@ export default function Edit() {
         }
       });
       setChecked(checkedPop);
-      // ---------
 
     })();
   }, [router]);
   // console.log("slug: " + slug);
-
-  // Whitelist option preparation
-  // This useEffect only runs on mount
-  useEffect(() => {
-    (async () => {
-      // Get all possible whitelists
-      const docSnap = await getDocs(collection(db, "whitelists"));
-      // setWhitelists(docSnap.docs);
-      // An array of tuples [[id, name]...]
-      let whitelistId_Name = Array(docSnap.docs.length);
-      docSnap.docs.map((doc, i) => {
-        const pair: readonly [id: String, name: String] = [doc.id, doc.data().name];
-        whitelistId_Name[i] = pair;
-      });
-      setWhitelists(whitelistId_Name);
-
-      
-    })();
-  }, []);
 
 
   const updateContent = (i: number, content: question) => {
