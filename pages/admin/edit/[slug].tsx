@@ -46,9 +46,13 @@ export default function Edit() {
   const [formData, setFormData] = useState(Object);
   const [questionContent, setQuestionContent] = useState(Array<DocumentData>);
   const [whitelists, setWhitelists] = useState(Array<[string, string][]>);
-  // const [formOptions, setFormOptions] = useState(Object);
-  // Checkbox state
+
+  // Checkboxes
   const [checked, setChecked] = useState(Array<Boolean>);
+  // Toggle state
+  const [active, setActive] = useState(Boolean);
+  // Date
+  const [date, setDate] = useState(Date);
 
 
   // Whitelist option preparation
@@ -75,7 +79,7 @@ export default function Edit() {
       // Set questions
       setQuestionContent(data?.questions);
 
-      // ---------
+
       // Prepare whitelist states
       // activeWhitelists: Currently set whitelists from DB
       const activeWhitelists = data?.options?.whitelist;
@@ -83,11 +87,7 @@ export default function Edit() {
       const allWhitelists = await whitelistAll();
 
       let checkedPop = Array(allWhitelists.length);
-      // console.log(allWhitelists);
-      // console.log(activeWhitelists);
       allWhitelists.map((_, i) => {
-        // console.log("mapping: " + i)
-        // console.log(activeWhitelists);
         if (activeWhitelists?.includes(allWhitelists[i][0])) {
           checkedPop[i] = true;
         } else {
@@ -95,6 +95,11 @@ export default function Edit() {
         }
       });
       setChecked(checkedPop);
+
+
+      // Prepare toggle & Date
+      setActive(data?.options?.active);
+      setDate(data?.options?.endDate);
 
     })();
   }, [router]);
@@ -119,7 +124,7 @@ export default function Edit() {
     });
 
     const finalOptions: options = {
-      active: true,
+      active: active,
       whitelist: activeWhitelists,
       endDate: new Date("2024-03-25T12:00:00-06:30")
     }
@@ -196,6 +201,10 @@ export default function Edit() {
   //   }
   // }
 
+  const onChangeToggle = () => {
+    setActive(!active);
+  }
+
   const onChangeWhitelist = (i: number) => {
     let checkedCopy = [...checked];
     checkedCopy[i] = !checkedCopy[i];
@@ -236,7 +245,8 @@ export default function Edit() {
               <label className="relative flex justify-start items-center group p-2 text-xl">
                 <input 
                 type="checkbox" 
-                // checked={}
+                checked={active}
+                onChange={() => onChangeToggle()}
                 className="absolute left-1/2 -translate-x-1/2 w-full h-full peer appearance-none rounded-md" />
                 <span className="w-16 h-10 flex items-center flex-shrink-0 ml-4 p-1 bg-gray-300 rounded-full duration-300 ease-in-out peer-checked:bg-black after:w-8 after:h-8 after:bg-white after:rounded-full after:shadow-md after:duration-300 peer-checked:after:translate-x-6"></span>
                 <span className="ml-5">Active</span>
