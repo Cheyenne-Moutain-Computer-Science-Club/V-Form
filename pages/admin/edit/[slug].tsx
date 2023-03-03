@@ -1,9 +1,9 @@
 import { useRouter } from "next/router";
 import { app } from '@lib/firebase';
-import { getFirestore, doc, setDoc, getDoc, DocumentData } from 'firebase/firestore';
+import { collection, getFirestore, doc, setDoc, getDoc, getDocs, DocumentData } from 'firebase/firestore';
 import { useState, useEffect } from "react";
-import EditDropdownTypeSheet from "@/components/questionTypes/editable/EditDropdownFromSheet";
 import { v4 as uuidv4 } from "uuid";
+import EditDropdownTypeSheet from "@/components/questionTypes/editable/EditDropdownFromSheet";
 
 const db = getFirestore(app);
 
@@ -15,6 +15,12 @@ interface question {
 	type: string;
 	items: string[];
 	placeholder: string;
+}
+
+interface options {
+  active: boolean;
+  whitelist: string[]; // Array of strings with whitelist ids
+  endDate: Date;
 }
 
 const onMount = async (slug: any) => {
@@ -38,12 +44,62 @@ export default function Edit() {
 
   const [formData, setFormData] = useState(Object);
   const [questionContent, setQuestionContent] = useState(Array<DocumentData>);
+  const [whitelists, setWhitelists] = useState(Array<[string, string][]>);
 
+  // Checkboxes
+  const [checked, setChecked] = useState(Array<Boolean>);
+  // Toggle state
+  const [active, setActive] = useState(Boolean);
+  // Date
+  const [date, setDate] = useState(Date);
+
+
+  // Whitelist option preparation
+  const whitelistAll = async () => {
+    // Get all possible whitelists
+    const docSnap = await getDocs(collection(db, "whitelists"));
+    // setWhitelists(docSnap.docs);
+    // An array of tuples [[id, name]...]
+    let whitelistId_Name = Array(docSnap.docs.length);
+    docSnap.docs.map((doc, i) => {
+      const pair: readonly [id: String, name: String] = [doc.id, doc.data().name];
+      whitelistId_Name[i] = pair;
+    });
+    setWhitelists(whitelistId_Name);
+    return whitelistId_Name;
+  };
+
+  // Runs on mount & slug change
   useEffect(() => {
     (async () => {
+      // Get document based on URL slug
       const data = await onMount(slug);
       setFormData(data);
+      // Set questions
       setQuestionContent(data?.questions);
+
+
+      // Prepare whitelist states
+      // activeWhitelists: Currently set whitelists from DB
+      const activeWhitelists = data?.options?.whitelist;
+      // allWhitelists: All possible whitelists from DB
+      const allWhitelists = await whitelistAll();
+
+      let checkedPop = Array(allWhitelists.length);
+      allWhitelists.map((_, i) => {
+        if (activeWhitelists?.includes(allWhitelists[i][0])) {
+          checkedPop[i] = true;
+        } else {
+          checkedPop[i] = false;
+        }
+      });
+      setChecked(checkedPop);
+
+
+      // Prepare toggle & Date
+      setActive(data?.options?.active);
+      setDate(data?.options?.endDate);
+
     })();
   }, [router]);
   // console.log("slug: " + slug);
@@ -56,13 +112,33 @@ export default function Edit() {
     // console.log(questionContent);
   }
 
+  // Parse options to be saved to DB
+  const prepareOptions = (): options => {
+    // Whitelists
+    let activeWhitelists = Array<string>();
+    checked.map((_, i) => {
+      if (checked[i]) {
+        activeWhitelists.push(whitelists[i][0].toString());
+      }
+    });
+
+    const finalOptions: options = {
+      active: active,
+      whitelist: activeWhitelists,
+      endDate: new Date("2024-03-25T12:00:00-06:30")
+    }
+    return finalOptions;
+  }
+
   // Database outgoing interaction
   const handleSave = async () => {
     // TODO: remove blank lines
     // TODO: confirmation
     // console.log(questionContent);
+    const options = prepareOptions();
+
     const docRef = doc(db, "forms", `${slug}`);
-    await setDoc(docRef, {questions: questionContent}, {merge: true});
+    await setDoc(docRef, {questions: questionContent, options: options}, {merge: true});
   }
 
   const addQuestion = () => {
@@ -87,7 +163,6 @@ export default function Edit() {
     setQuestionContent(contentCopy);
     console.log(questionContent);
   }
-
   
   const questionSet = questionContent?.map((question: DocumentData, i: number) => {
     // Sort question type
@@ -115,12 +190,74 @@ export default function Edit() {
     }
   });
 
+
+  // Options things
+  // const updateOptions = (option: number) => {
+  //   let optionsCopy = formOptions;
+  //   switch (option) {
+  //     case (2):
+  //       optionsCopy.whitelist = 
+  //   }
+  // }
+
+  const onChangeToggle = () => {
+    setActive(!active);
+  }
+
+  const onChangeWhitelist = (i: number) => {
+    let checkedCopy = [...checked];
+    checkedCopy[i] = !checkedCopy[i];
+    setChecked(checkedCopy);
+    // console.log(checked);
+  }
+  // const whitelistSnapshot = (async () => {
+  //   const docSnap = await getDocs(collection(db, "whitelist"));
+  //   return docSnap;
+  // })();
+  const whitelistSet = whitelists.map((list, i) => {
+    return (
+      <div>
+        <label className="ml-1">
+          <input
+                  type="checkbox"
+                  // TODO: see if a better solution is available here
+                  checked={!!checked[i]}
+                  onChange={() => onChangeWhitelist(i)}
+                  className="checked:bg-accent h-4 w-4 appearance-none rounded border-2 border-gray-900 bg-neutral-50 focus:ring-0"
+                />
+        {list[1]}</label>
+      </div>
+    );
+  });
+
   return (
     <div className="text-black">
-      <div>
-        <h1>{formData?.header}</h1>
+      <div className="m-5">
+        <h1 className="font-semibold flex justify-center text-3xl">{formData?.header}</h1>
       </div>
       <div className="m-5">
+        <div className="border-2 border-gray-900">
+          <h2 className="flex text-2xl justify-center m-2 font-semibold">Form Settings</h2>
+          <hr className="bg-neutral-200 h-1 rounded mx-5 mb-3"/>
+          <div className="m-10 space-y-5">
+            {/* <Toggle option={"Active"}/> */}
+              <label className="relative flex justify-start items-center group p-2 text-xl">
+                <input 
+                type="checkbox" 
+                checked={active}
+                onChange={() => onChangeToggle()}
+                className="absolute left-1/2 -translate-x-1/2 w-full h-full peer appearance-none rounded-md" />
+                <span className="w-16 h-10 flex items-center flex-shrink-0 ml-4 p-1 bg-gray-300 rounded-full duration-300 ease-in-out peer-checked:bg-black after:w-8 after:h-8 after:bg-white after:rounded-full after:shadow-md after:duration-300 peer-checked:after:translate-x-6"></span>
+                <span className="ml-5">Active</span>
+              </label>
+            <div>
+              <h3 className="font-semibold underline">Whitelists:</h3>
+              <div>
+                {whitelistSet}
+              </div>
+            </div>
+          </div>
+        </div>
         {questionSet}
         <div className="border-2 border-gray-900 rounded py-2 flex">
           <svg
@@ -139,9 +276,9 @@ export default function Edit() {
         </div>
       </div>
       <div className="justify-center flex mb-5">
-        <button onClick={handleSave} className="rounded-md bg-green-500 px-7 py-2">Save</button>
+        <button onClick={handleSave} className="rounded-md bg-green-500 px-7 py-2 hover:bg-green-400">Save</button>
         <br className="m-2"/>
-        <button className="bg-rose-500 px-6 py-2 rounded-md">Cancel</button>
+        <button className="bg-rose-500 px-6 py-2 rounded-md hover:bg-rose-400">Cancel</button>
       </div>
     </div>
   )
