@@ -223,7 +223,7 @@ export default function Edit() {
                   // TODO: see if a better solution is available here
                   checked={!!checked[i]}
                   onChange={() => onChangeWhitelist(i)}
-                  className="checked:bg-accent h-4 w-4 appearance-none rounded border-2 border-gray-900 bg-neutral-50 focus:ring-0"
+                  className="mr-2 checked:bg-accent h-4 w-4 appearance-none rounded border-2 border-gray-900 bg-neutral-50 focus:ring-0"
                 />
         {list[1]}</label>
       </div>
@@ -255,6 +255,14 @@ export default function Edit() {
               <div>
                 {whitelistSet}
               </div>
+            </div>
+            <div>
+              <label className="relativr flex justify-start items-center group p-2 text-xl">
+                <span className="font-semibold">Enter and end date and time:</span>
+                <input
+                type="datetime-local"
+                className="bg-gray-200 ml-2"/>
+              </label>
             </div>
           </div>
         </div>
