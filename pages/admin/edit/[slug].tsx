@@ -4,7 +4,6 @@ import { collection, getFirestore, doc, setDoc, getDoc, getDocs, DocumentData } 
 import { useState, useEffect } from "react";
 import { v4 as uuidv4 } from "uuid";
 import EditDropdownTypeSheet from "@/components/questionTypes/editable/EditDropdownFromSheet";
-import Toggle from "@/components/toggle";
 
 const db = getFirestore(app);
 
