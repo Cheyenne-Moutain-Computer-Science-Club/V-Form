@@ -98,10 +98,7 @@ export default function Edit() {
 
       // Prepare toggle & Date
       setActive(data?.options?.active);
-      const unixDate = data?.options?.endDate.seconds;
-      const isoDate = new Date(unixDate * 1000).toISOString().replace("Z", "")
-      setDate(isoDate);
-      // setDate((data?.options?.endDate.seconds * 1000));
+      setDate(data?.options?.endDate.seconds);
       // console.log(date);
       // console.log(new Date(date * 1000).toISOString().replace("Z", "") + "");
     })();
@@ -210,7 +207,6 @@ export default function Edit() {
   }
 
   const onChangeDate = (event: React.ChangeEvent<HTMLInputElement>) => {
-    if (!event.target['validity'].valid) return;
     // console.log("iso: " + event.target.value)
     // const iso8601 = event.target.value;
     // const parsedDate = Date.parse(iso8601);
@@ -219,7 +215,6 @@ export default function Edit() {
     // console.log("parsed: " + parsedDate)
     // console.log("new iso: " + new Date(parsedDate).toISOString().replace("Z", ""));
     // setDate(event.target.value);
-    console.log(date);
   }
 
   const onChangeWhitelist = (i: number) => {
@@ -280,8 +275,7 @@ export default function Edit() {
                 <input
                 type="datetime-local"
                 onChange={(event) => onChangeDate(event)}
-                // defaultValue={new Date(date).toISOString().replace("Z", "")}
-                defaultValue={date}
+                defaultValue={new Date(date * 1000).toISOString().replace("Z", "")}
                 className="bg-gray-200 ml-2"/>
               </label>
             </div>
