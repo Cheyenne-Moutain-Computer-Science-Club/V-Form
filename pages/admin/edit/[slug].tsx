@@ -2,7 +2,7 @@ import { useRouter } from "next/router";
 import { app } from '@lib/firebase';
 import { collection, getFirestore, doc, setDoc, getDoc, getDocs, DocumentData, Timestamp } from 'firebase/firestore';
 import React, { useState, useEffect } from "react";
-import { v4 as uuidv4 } from "uuid";
+import { NIL, v4 as uuidv4 } from "uuid";
 import EditDropdownTypeSheet from "@/components/questionTypes/editable/EditDropdownFromSheet";
 
 const db = getFirestore(app);
@@ -50,8 +50,8 @@ export default function Edit() {
   const [checked, setChecked] = useState(Array<Boolean>);
   // Toggle state
   const [active, setActive] = useState(Boolean);
-  // ISO8601
-  const [date, setDate] = useState(String);
+  // Unix epoch
+  const [date, setDate] = useState(0);
 
 
   // Whitelist option preparation
@@ -207,10 +207,12 @@ export default function Edit() {
 
   const onChangeDate = (event: React.ChangeEvent<HTMLInputElement>) => {
     // console.log("iso: " + event.target.value)
-    // const iso8601 = event.target.value;
-    // const parsedDate = Date.parse(iso8601);
-    // setDate(parsedDate);
-    setDate(event.target.value);
+    const iso8601 = event.target.value;
+    const parsedDate = Date.parse(iso8601);
+    setDate(parsedDate);
+    // console.log("parsed: " + parsedDate)
+    // console.log("new iso: " + new Date(parsedDate).toISOString().replace("Z", ""));
+    // setDate(event.target.value);
   }
 
   const onChangeWhitelist = (i: number) => {
@@ -271,6 +273,7 @@ export default function Edit() {
                 <input
                 type="datetime-local"
                 onChange={(event) => onChangeDate(event)}
+                value={new Date(date).toISOString().replace("Z", "")}
                 className="bg-gray-200 ml-2"/>
               </label>
             </div>
