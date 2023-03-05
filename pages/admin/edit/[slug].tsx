@@ -273,7 +273,7 @@ export default function Edit() {
                 <input
                 type="datetime-local"
                 onChange={(event) => onChangeDate(event)}
-                value={new Date(date * 1000).toISOString().replace("Z", "")}
+                defaultValue={new Date(date * 1000).toISOString().replace("Z", "")}
                 className="bg-gray-200 ml-2"/>
               </label>
             </div>
