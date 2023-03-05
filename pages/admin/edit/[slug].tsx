@@ -1,7 +1,7 @@
 import { useRouter } from "next/router";
 import { app } from '@lib/firebase';
-import { collection, getFirestore, doc, setDoc, getDoc, getDocs, DocumentData } from 'firebase/firestore';
-import { useState, useEffect } from "react";
+import { collection, getFirestore, doc, setDoc, getDoc, getDocs, DocumentData, Timestamp } from 'firebase/firestore';
+import React, { useState, useEffect } from "react";
 import { v4 as uuidv4 } from "uuid";
 import EditDropdownTypeSheet from "@/components/questionTypes/editable/EditDropdownFromSheet";
 
@@ -50,8 +50,8 @@ export default function Edit() {
   const [checked, setChecked] = useState(Array<Boolean>);
   // Toggle state
   const [active, setActive] = useState(Boolean);
-  // Date
-  const [date, setDate] = useState(Date);
+  // ISO8601
+  const [date, setDate] = useState(String);
 
 
   // Whitelist option preparation
@@ -98,7 +98,8 @@ export default function Edit() {
 
       // Prepare toggle & Date
       setActive(data?.options?.active);
-      setDate(data?.options?.endDate);
+      setDate(data?.options?.endDate.seconds);
+      // console.log(date);
 
     })();
   }, [router]);
@@ -204,6 +205,14 @@ export default function Edit() {
     setActive(!active);
   }
 
+  const onChangeDate = (event: React.ChangeEvent<HTMLInputElement>) => {
+    // console.log("iso: " + event.target.value)
+    // const iso8601 = event.target.value;
+    // const parsedDate = Date.parse(iso8601);
+    // setDate(parsedDate);
+    setDate(event.target.value);
+  }
+
   const onChangeWhitelist = (i: number) => {
     let checkedCopy = [...checked];
     checkedCopy[i] = !checkedCopy[i];
@@ -261,6 +270,7 @@ export default function Edit() {
                 <span className="font-semibold">Enter and end date and time:</span>
                 <input
                 type="datetime-local"
+                onChange={(event) => onChangeDate(event)}
                 className="bg-gray-200 ml-2"/>
               </label>
             </div>
