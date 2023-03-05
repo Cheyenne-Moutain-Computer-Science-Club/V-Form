@@ -99,8 +99,7 @@ export default function Edit() {
       // Prepare toggle & Date
       setActive(data?.options?.active);
       setDate(data?.options?.endDate.seconds);
-      // console.log(date);
-
+      console.log(date + "");
     })();
   }, [router]);
   // console.log("slug: " + slug);
