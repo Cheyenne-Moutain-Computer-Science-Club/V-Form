@@ -126,8 +126,9 @@ export default function Edit() {
     const finalOptions: options = {
       active: active,
       whitelist: activeWhitelists,
-      endDate: new Date("2024-03-25T12:00:00-06:30")
+      endDate: new Date(date) // Date
     }
+    console.log(finalOptions);
     return finalOptions;
   }
 
