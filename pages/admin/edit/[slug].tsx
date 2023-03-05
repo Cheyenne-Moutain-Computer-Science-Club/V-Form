@@ -99,7 +99,8 @@ export default function Edit() {
       // Prepare toggle & Date
       setActive(data?.options?.active);
       setDate(data?.options?.endDate.seconds);
-      console.log(date + "");
+      // console.log(date);
+      // console.log(new Date(date * 1000).toISOString().replace("Z", "") + "");
     })();
   }, [router]);
   // console.log("slug: " + slug);
@@ -161,7 +162,7 @@ export default function Edit() {
     let contentCopy = [...questionContent];
     contentCopy.splice(i, 1);
     setQuestionContent(contentCopy);
-    console.log(questionContent);
+    // console.log(questionContent);
   }
   
   const questionSet = questionContent?.map((question: DocumentData, i: number) => {
@@ -272,7 +273,7 @@ export default function Edit() {
                 <input
                 type="datetime-local"
                 onChange={(event) => onChangeDate(event)}
-                value={new Date(date).toISOString().replace("Z", "")}
+                value={new Date(date * 1000).toISOString().replace("Z", "")}
                 className="bg-gray-200 ml-2"/>
               </label>
             </div>
