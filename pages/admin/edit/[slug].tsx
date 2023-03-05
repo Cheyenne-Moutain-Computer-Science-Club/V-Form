@@ -2,7 +2,7 @@ import { useRouter } from "next/router";
 import { app } from '@lib/firebase';
 import { collection, getFirestore, doc, setDoc, getDoc, getDocs, DocumentData, Timestamp } from 'firebase/firestore';
 import React, { useState, useEffect } from "react";
-import { NIL, v4 as uuidv4 } from "uuid";
+import { v4 as uuidv4 } from "uuid";
 import EditDropdownTypeSheet from "@/components/questionTypes/editable/EditDropdownFromSheet";
 
 const db = getFirestore(app);
@@ -51,7 +51,7 @@ export default function Edit() {
   // Toggle state
   const [active, setActive] = useState(Boolean);
   // Unix epoch
-  const [date, setDate] = useState(0);
+  const [date, setDate] = useState(new Date().toISOString().replace("Z", ""));
 
 
   // Whitelist option preparation
@@ -98,7 +98,10 @@ export default function Edit() {
 
       // Prepare toggle & Date
       setActive(data?.options?.active);
-      setDate(data?.options?.endDate.seconds * 1000);
+      const unixDate = data?.options?.endDate.seconds;
+      const isoDate = new Date(unixDate * 1000).toISOString().replace("Z", "")
+      setDate(isoDate);
+      // setDate((data?.options?.endDate.seconds * 1000));
       // console.log(date);
       // console.log(new Date(date * 1000).toISOString().replace("Z", "") + "");
     })();
@@ -209,9 +212,10 @@ export default function Edit() {
   const onChangeDate = (event: React.ChangeEvent<HTMLInputElement>) => {
     if (!event.target['validity'].valid) return;
     // console.log("iso: " + event.target.value)
-    const iso8601 = event.target.value;
-    const parsedDate = Date.parse(iso8601);
-    setDate(parsedDate);
+    // const iso8601 = event.target.value;
+    // const parsedDate = Date.parse(iso8601);
+    // setDate(parsedDate);
+    setDate(event.target.value);
     // console.log("parsed: " + parsedDate)
     // console.log("new iso: " + new Date(parsedDate).toISOString().replace("Z", ""));
     // setDate(event.target.value);
@@ -276,7 +280,8 @@ export default function Edit() {
                 <input
                 type="datetime-local"
                 onChange={(event) => onChangeDate(event)}
-                defaultValue={new Date(date).toISOString().replace("Z", "")}
+                // defaultValue={new Date(date).toISOString().replace("Z", "")}
+                defaultValue={date}
                 className="bg-gray-200 ml-2"/>
               </label>
             </div>
