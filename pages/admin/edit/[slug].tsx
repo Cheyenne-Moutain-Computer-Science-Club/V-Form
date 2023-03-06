@@ -20,7 +20,7 @@ interface question {
 interface options {
   active: boolean;
   whitelist: string[]; // Array of strings with whitelist ids
-  endDate: Date;
+  endDate: any;
 }
 
 const onMount = async (slug: any) => {
@@ -126,7 +126,7 @@ export default function Edit() {
     const finalOptions: options = {
       active: active,
       whitelist: activeWhitelists,
-      endDate: new Date("2024-03-25T12:00:00-06:30")
+      endDate: Timestamp.fromDate(new Date(date))
     }
     return finalOptions;
   }
