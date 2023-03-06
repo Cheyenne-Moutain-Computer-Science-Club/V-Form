@@ -1,4 +1,4 @@
-mport { useRouter } from "next/router";
+import { useRouter } from "next/router";
 import { app } from '@lib/firebase';
 import { collection, getFirestore, doc, setDoc, getDoc, getDocs, DocumentData, Timestamp } from 'firebase/firestore';
 import React, { useState, useEffect } from "react";
