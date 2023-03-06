@@ -1,7 +1,7 @@
 import { useRouter } from "next/router";
 import { app } from '@lib/firebase';
-import { collection, getFirestore, doc, setDoc, getDoc, getDocs, DocumentData } from 'firebase/firestore';
-import { useState, useEffect } from "react";
+import { collection, getFirestore, doc, setDoc, getDoc, getDocs, DocumentData, Timestamp } from 'firebase/firestore';
+import React, { useState, useEffect } from "react";
 import { v4 as uuidv4 } from "uuid";
 import EditDropdownTypeSheet from "@/components/questionTypes/editable/EditDropdownFromSheet";
 
@@ -20,7 +20,7 @@ interface question {
 interface options {
   active: boolean;
   whitelist: string[]; // Array of strings with whitelist ids
-  endDate: Date;
+  endDate: any;
 }
 
 const onMount = async (slug: any) => {
@@ -50,8 +50,8 @@ export default function Edit() {
   const [checked, setChecked] = useState(Array<Boolean>);
   // Toggle state
   const [active, setActive] = useState(Boolean);
-  // Date
-  const [date, setDate] = useState(Date);
+  // Unix epoch
+  const [date, setDate] = useState(0);
 
 
   // Whitelist option preparation
@@ -98,8 +98,9 @@ export default function Edit() {
 
       // Prepare toggle & Date
       setActive(data?.options?.active);
-      setDate(data?.options?.endDate);
-
+      setDate(data?.options?.endDate.seconds * 1000);
+      // console.log(date);
+      // console.log(new Date(date * 1000).toISOString().replace("Z", "") + "");
     })();
   }, [router]);
   // console.log("slug: " + slug);
@@ -125,7 +126,7 @@ export default function Edit() {
     const finalOptions: options = {
       active: active,
       whitelist: activeWhitelists,
-      endDate: new Date("2024-03-25T12:00:00-06:30")
+      endDate: Timestamp.fromDate(new Date(date))
     }
     return finalOptions;
   }
@@ -161,7 +162,7 @@ export default function Edit() {
     let contentCopy = [...questionContent];
     contentCopy.splice(i, 1);
     setQuestionContent(contentCopy);
-    console.log(questionContent);
+    // console.log(questionContent);
   }
   
   const questionSet = questionContent?.map((question: DocumentData, i: number) => {
@@ -204,6 +205,20 @@ export default function Edit() {
     setActive(!active);
   }
 
+  const onChangeDate = (event: React.ChangeEvent<HTMLInputElement>) => {
+    console.log(Date.parse(event.target.value));
+    // const year = new Date(event.target.value).getFullYear().toString();
+    if (!event.target['validity'].valid /*|| year.length != 4*/) return;
+    // console.log("iso: " + event.target.value)
+    const iso8601 = event.target.value;
+    const parsedDate = Date.parse(iso8601);
+    setDate(parsedDate);
+    // console.log("parsed: " + parsedDate)
+    // console.log("new iso: " + new Date(parsedDate).toISOString().replace("Z", ""));
+    // setDate(event.target.value);
+    console.log(date);
+  }
+
   const onChangeWhitelist = (i: number) => {
     let checkedCopy = [...checked];
     checkedCopy[i] = !checkedCopy[i];
@@ -223,7 +238,7 @@ export default function Edit() {
                   // TODO: see if a better solution is available here
                   checked={!!checked[i]}
                   onChange={() => onChangeWhitelist(i)}
-                  className="checked:bg-accent h-4 w-4 appearance-none rounded border-2 border-gray-900 bg-neutral-50 focus:ring-0"
+                  className="mr-2 checked:bg-accent h-4 w-4 appearance-none rounded border-2 border-gray-900 bg-neutral-50 focus:ring-0"
                 />
         {list[1]}</label>
       </div>
@@ -255,6 +270,18 @@ export default function Edit() {
               <div>
                 {whitelistSet}
               </div>
+            </div>
+            <div>
+              <label className="relativr flex justify-start items-center group p-2 text-xl">
+                <span className="font-semibold">Enter and end date and time:</span>
+                <input
+                type="datetime-local"
+                onChange={(event) => onChangeDate(event)}
+                defaultValue={new Date(date).toISOString().slice(0, -8)}
+                min={new Date().toString()}
+                max="2025-06-12T00:00"
+                className="bg-gray-200 ml-2"/>
+              </label>
             </div>
           </div>
         </div>
