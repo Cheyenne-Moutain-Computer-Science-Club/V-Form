@@ -2,7 +2,7 @@ import { useRouter } from "next/router";
 import { app } from '@lib/firebase';
 import { collection, getFirestore, doc, setDoc, getDoc, getDocs, DocumentData, Timestamp } from 'firebase/firestore';
 import React, { useState, useEffect } from "react";
-import { NIL, v4 as uuidv4 } from "uuid";
+import { v4 as uuidv4 } from "uuid";
 import EditDropdownTypeSheet from "@/components/questionTypes/editable/EditDropdownFromSheet";
 
 const db = getFirestore(app);
@@ -206,7 +206,9 @@ export default function Edit() {
   }
 
   const onChangeDate = (event: React.ChangeEvent<HTMLInputElement>) => {
-    if (!event.target['validity'].valid) return;
+    console.log(Date.parse(event.target.value));
+    // const year = new Date(event.target.value).getFullYear().toString();
+    if (!event.target['validity'].valid /*|| year.length != 4*/) return;
     // console.log("iso: " + event.target.value)
     const iso8601 = event.target.value;
     const parsedDate = Date.parse(iso8601);
@@ -275,7 +277,9 @@ export default function Edit() {
                 <input
                 type="datetime-local"
                 onChange={(event) => onChangeDate(event)}
-                defaultValue={new Date(date).toISOString().replace("Z", "")}
+                defaultValue={new Date(date).toISOString().slice(0, -8)}
+                min={new Date().toString()}
+                max="2025-06-12T00:00"
                 className="bg-gray-200 ml-2"/>
               </label>
             </div>
