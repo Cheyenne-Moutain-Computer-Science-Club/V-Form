@@ -26,8 +26,6 @@ interface options {
 const onMount = async (slug: any) => {
   const docRef = doc(db, "forms", `${slug}`);
     const docSnap = await getDoc(docRef);
-    // console.log(`slug (${slug}) has doc?`, docSnap.exists());
-
     // Redirect if DNE
     if (!docSnap.exists()) {
       // router.push("/admin");
@@ -58,7 +56,6 @@ export default function Edit() {
   const whitelistAll = async () => {
     // Get all possible whitelists
     const docSnap = await getDocs(collection(db, "whitelists"));
-    // setWhitelists(docSnap.docs);
     // An array of tuples [[id, name]...]
     let whitelistId_Name = Array(docSnap.docs.length);
     docSnap.docs.map((doc, i) => {
@@ -99,18 +96,14 @@ export default function Edit() {
       // Prepare toggle & Date
       setActive(data?.options?.active);
       setDate(data?.options?.endDate.seconds * 1000);
-      // console.log(date);
-      // console.log(new Date(date * 1000).toISOString().replace("Z", "") + "");
     })();
   }, [router]);
-  // console.log("slug: " + slug);
 
 
   const updateContent = (i: number, content: question) => {
     let contentCopy = questionContent;
     contentCopy[i] = content;
     setQuestionContent(contentCopy);
-    // console.log(questionContent);
   }
 
   // Parse options to be saved to DB
@@ -135,7 +128,6 @@ export default function Edit() {
   const handleSave = async () => {
     // TODO: remove blank lines
     // TODO: confirmation
-    // console.log(questionContent);
     const options = prepareOptions();
 
     const docRef = doc(db, "forms", `${slug}`);
@@ -143,7 +135,6 @@ export default function Edit() {
   }
 
   const addQuestion = () => {
-    // let contentCopy = questionContent;
     const newQuestion: question = {
       title: "New Question",
       description: "New Description",
@@ -152,17 +143,14 @@ export default function Edit() {
       items: ["Item1", "Item2"],
       placeholder: "Placeholder"
     }
-    // contentCopy.push(newQuestion);
     const newContent = [...questionContent, newQuestion];
     setQuestionContent(newContent);
-    console.log(questionContent);
   }
 
   const removeQuestion = (i: number) => {
     let contentCopy = [...questionContent];
     contentCopy.splice(i, 1);
     setQuestionContent(contentCopy);
-    // console.log(questionContent);
   }
   
   const questionSet = questionContent?.map((question: DocumentData, i: number) => {
@@ -192,43 +180,23 @@ export default function Edit() {
   });
 
 
-  // Options things
-  // const updateOptions = (option: number) => {
-  //   let optionsCopy = formOptions;
-  //   switch (option) {
-  //     case (2):
-  //       optionsCopy.whitelist = 
-  //   }
-  // }
-
   const onChangeToggle = () => {
     setActive(!active);
   }
 
   const onChangeDate = (event: React.ChangeEvent<HTMLInputElement>) => {
-    console.log(Date.parse(event.target.value));
-    // const year = new Date(event.target.value).getFullYear().toString();
     if (!event.target['validity'].valid /*|| year.length != 4*/) return;
-    // console.log("iso: " + event.target.value)
     const iso8601 = event.target.value;
     const parsedDate = Date.parse(iso8601);
     setDate(parsedDate);
-    // console.log("parsed: " + parsedDate)
-    // console.log("new iso: " + new Date(parsedDate).toISOString().replace("Z", ""));
-    // setDate(event.target.value);
-    console.log(date);
   }
 
   const onChangeWhitelist = (i: number) => {
     let checkedCopy = [...checked];
     checkedCopy[i] = !checkedCopy[i];
     setChecked(checkedCopy);
-    // console.log(checked);
   }
-  // const whitelistSnapshot = (async () => {
-  //   const docSnap = await getDocs(collection(db, "whitelist"));
-  //   return docSnap;
-  // })();
+
   const whitelistSet = whitelists.map((list, i) => {
     return (
       <div>
@@ -255,7 +223,6 @@ export default function Edit() {
           <h2 className="flex text-2xl justify-center m-2 font-semibold">Form Settings</h2>
           <hr className="bg-neutral-200 h-1 rounded mx-5 mb-3"/>
           <div className="m-10 space-y-5">
-            {/* <Toggle option={"Active"}/> */}
               <label className="relative flex justify-start items-center group p-2 text-xl">
                 <input 
                 type="checkbox" 
