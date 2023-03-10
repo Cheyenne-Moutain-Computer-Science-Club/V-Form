@@ -187,7 +187,7 @@ function Admin() {
 										}
 										type="text"
 										placeholder="Form Name"
-										className="h-12 w-96 rounded border-b-2 border-neutral-800 bg-neutral-200 p-2 text-gray-900 outline-none placeholder:italic placeholder:text-gray-400"
+										className="h-12 w-96 rounded border-b-2 border-neutral-900 bg-neutral-200 p-2 text-gray-900 outline-none placeholder:italic placeholder:text-gray-400"
 									/>
 									<button
 										className="h-12 w-28 rounded border-2 border-gray-900 hover:bg-gray-900 hover:text-neutral-50"

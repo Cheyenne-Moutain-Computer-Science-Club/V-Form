@@ -69,7 +69,7 @@ export default function SearchableDropdown({
 					}}
 					onClick={toggle}
 					placeholder={placeholder}
-					className={`h-8 w-80 rounded border-2 border-neutral-800 bg-neutral-50 p-2 text-gray-900 outline-none placeholder:italic placeholder:text-gray-400`}
+					className={`h-8 w-80 rounded border-b-2 border-neutral-800 bg-neutral-200 p-2 text-gray-900 outline-none placeholder:italic placeholder:text-gray-400`}
 				/>
 			</div>
 
