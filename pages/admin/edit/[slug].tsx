@@ -1,9 +1,12 @@
 import { useRouter } from "next/router";
 import { app } from '@lib/firebase';
-import { getFirestore, doc, setDoc, getDoc, DocumentData } from 'firebase/firestore';
-import { useState, useEffect } from "react";
-import EditDropdownTypeSheet from "@/components/questionTypes/editable/EditDropdownFromSheet";
+import { collection, getFirestore, doc, setDoc, getDoc, getDocs, DocumentData, Timestamp } from 'firebase/firestore';
+import React, { useState, useEffect } from "react";
 import { v4 as uuidv4 } from "uuid";
+import EditDropdownTypeSheet from "@/components/questionTypes/editable/EditDropdownFromSheet";
+import StickyAlert from "@/components/errors-and-confirmation/StickyAlert";
+import ConfirmationModal from "@/components/errors-and-confirmation/ConfirmationModal";
+import Link from "next/link";
 
 const db = getFirestore(app);
 
@@ -17,11 +20,15 @@ interface question {
 	placeholder: string;
 }
 
+interface options {
+  active: boolean;
+  whitelist: string[]; // Array of strings with whitelist ids
+  endDate: Timestamp;
+}
+
 const onMount = async (slug: any) => {
   const docRef = doc(db, "forms", `${slug}`);
     const docSnap = await getDoc(docRef);
-    // console.log(`slug (${slug}) has doc?`, docSnap.exists());
-
     // Redirect if DNE
     if (!docSnap.exists()) {
       // router.push("/admin");
@@ -34,39 +41,124 @@ const onMount = async (slug: any) => {
 export default function Edit() {
   const router = useRouter();
   // Get URL slug
-  const { slug } = router.query /*?? ""*/;
+  const { slug } = router.query /*?? ""*/
 
   const [formData, setFormData] = useState(Object);
   const [questionContent, setQuestionContent] = useState(Array<DocumentData>);
+  const [whitelists, setWhitelists] = useState(Array<[string, string][]>);
 
+  // Checkboxes
+  const [checked, setChecked] = useState(Array<Boolean>);
+  // Toggle state
+  const [active, setActive] = useState(Boolean);
+  // Unix epoch
+  const [date, setDate] = useState(0);
+
+  // Alerts
+  const [showAlert, setShowAlert] = useState(false);
+  const [alertData, setAlertData] = useState({title: "", message: "", color: ""});
+
+  // Confirmation modal
+  const [showModal, setShowModal] = useState(false);
+
+
+  // Whitelist option preparation
+  const whitelistAll = async () => {
+    // Get all possible whitelists
+    const docSnap = await getDocs(collection(db, "whitelists"));
+    // An array of tuples [[id, name]...]
+    let whitelistId_Name = Array(docSnap.docs.length);
+    docSnap.docs.map((doc, i) => {
+      const pair: readonly [id: String, name: String] = [doc.id, doc.data().name];
+      whitelistId_Name[i] = pair;
+    });
+    setWhitelists(whitelistId_Name);
+    return whitelistId_Name;
+  };
+
+  // Runs on mount & slug change
   useEffect(() => {
     (async () => {
+      // Get document based on URL slug
       const data = await onMount(slug);
       setFormData(data);
+      // Set questions
       setQuestionContent(data?.questions);
+
+
+      // Prepare whitelist states
+      // activeWhitelists: Currently set whitelists from DB
+      const activeWhitelists = data?.options?.whitelist;
+      // allWhitelists: All possible whitelists from DB
+      const allWhitelists = await whitelistAll();
+
+      let checkedPop = Array(allWhitelists.length);
+      allWhitelists.map((_, i) => {
+        if (activeWhitelists?.includes(allWhitelists[i][0])) {
+          checkedPop[i] = true;
+        } else {
+          checkedPop[i] = false;
+        }
+      });
+      setChecked(checkedPop);
+
+
+      // Prepare toggle & Date
+      setActive(data?.options?.active);
+      setDate(data?.options?.endDate.seconds * 1000);
     })();
   }, [router]);
-  // console.log("slug: " + slug);
 
 
   const updateContent = (i: number, content: question) => {
     let contentCopy = questionContent;
     contentCopy[i] = content;
     setQuestionContent(contentCopy);
-    // console.log(questionContent);
+  }
+
+  // Parse options to be saved to DB
+  const prepareOptions = (): options => {
+    // Whitelists
+    let activeWhitelists = Array<string>();
+    checked.map((_, i) => {
+      if (checked[i]) {
+        activeWhitelists.push(whitelists[i][0].toString());
+      }
+    });
+
+    const finalOptions: options = {
+      active: active,
+      whitelist: activeWhitelists,
+      endDate: Timestamp.fromDate(new Date(date))
+    }
+    return finalOptions;
   }
 
   // Database outgoing interaction
   const handleSave = async () => {
-    // TODO: remove blank lines
-    // TODO: confirmation
-    // console.log(questionContent);
-    const docRef = doc(db, "forms", `${slug}`);
-    await setDoc(docRef, {questions: questionContent}, {merge: true});
+    try {
+      // Errors
+      // Date out of range
+      // if (date > 29379481200000 || date < 1577862000000) {
+      //   throw "Date out of range: please select a date between today and 2900-12-31";
+      // }
+
+      setAlertData({title: "Form saved -", message: "Last saved: " + new Date().toLocaleString(), color: "green"});
+      setShowAlert(false);
+      // TODO: remove blank lines
+      // TODO: confirmation
+      const options = prepareOptions();
+
+      const docRef = doc(db, "forms", `${slug}`);
+      await setDoc(docRef, {questions: questionContent, options: options}, {merge: true});
+    } catch (error) {
+      setAlertData({title: "Error -", message: error as string, color: "rose"});
+    } finally {
+      setShowAlert(true);
+    }
   }
 
   const addQuestion = () => {
-    // let contentCopy = questionContent;
     const newQuestion: question = {
       title: "New Question",
       description: "New Description",
@@ -75,19 +167,15 @@ export default function Edit() {
       items: ["Item1", "Item2"],
       placeholder: "Placeholder"
     }
-    // contentCopy.push(newQuestion);
     const newContent = [...questionContent, newQuestion];
     setQuestionContent(newContent);
-    console.log(questionContent);
   }
 
   const removeQuestion = (i: number) => {
     let contentCopy = [...questionContent];
     contentCopy.splice(i, 1);
     setQuestionContent(contentCopy);
-    console.log(questionContent);
   }
-
   
   const questionSet = questionContent?.map((question: DocumentData, i: number) => {
     // Sort question type
@@ -115,12 +203,79 @@ export default function Edit() {
     }
   });
 
+
+  const onChangeToggle = () => {
+    setActive(!active);
+  }
+
+  const onChangeDate = (event: React.ChangeEvent<HTMLInputElement>) => {
+    if (!event.target['validity'].valid /*|| year.length != 4*/) return;
+    const iso8601 = event.target.value;
+    const parsedDate = Date.parse(iso8601);
+    setDate(parsedDate);
+  }
+
+  const onChangeWhitelist = (i: number) => {
+    let checkedCopy = [...checked];
+    checkedCopy[i] = !checkedCopy[i];
+    setChecked(checkedCopy);
+  }
+
+  const whitelistSet = whitelists.map((list, i) => {
+    return (
+      <div>
+        <label className="ml-1">
+          <input
+                  type="checkbox"
+                  // TODO: see if a better solution is available here
+                  checked={!!checked[i]}
+                  onChange={() => onChangeWhitelist(i)}
+                  className="mr-2 checked:bg-accent h-4 w-4 appearance-none rounded border-2 border-gray-900 bg-neutral-50 focus:ring-0"
+                />
+        {list[1]}</label>
+      </div>
+    );
+  });
+
   return (
     <div className="text-black">
-      <div>
-        <h1>{formData?.header}</h1>
+      <div className="m-5">
+        <h1 className="font-semibold flex justify-center text-3xl">{formData?.header}</h1>
       </div>
       <div className="m-5">
+        <div className="border-2 border-gray-900">
+          <h2 className="flex text-2xl justify-center m-2 font-semibold">Form Settings</h2>
+          <hr className="bg-neutral-200 h-1 rounded mx-5 mb-3"/>
+          <div className="m-10 space-y-5">
+              <label className="relative flex justify-start items-center group p-2 text-xl">
+                <input 
+                type="checkbox" 
+                checked={active}
+                onChange={() => onChangeToggle()}
+                className="absolute left-1/2 -translate-x-1/2 w-full h-full peer appearance-none rounded-md" />
+                <span className="w-16 h-10 flex items-center flex-shrink-0 ml-4 p-1 bg-gray-300 rounded-full duration-300 ease-in-out peer-checked:bg-black after:w-8 after:h-8 after:bg-white after:rounded-full after:shadow-md after:duration-300 peer-checked:after:translate-x-6"></span>
+                <span className="ml-5">Active</span>
+              </label>
+            <div>
+              <h3 className="font-semibold underline">Whitelists:</h3>
+              <div>
+                {whitelistSet}
+              </div>
+            </div>
+            <div>
+              <label className="relativr flex justify-start items-center group p-2 text-xl">
+                <span className="font-semibold">Enter and end date and time:</span>
+                <input
+                type="datetime-local"
+                onChange={(event) => onChangeDate(event)}
+                defaultValue={new Date(date).toISOString().slice(0, -8)}
+                min="2020-01-01T00:00"
+                max="2100-12-31T00:00"
+                className="bg-gray-200 ml-2"/>
+              </label>
+            </div>
+          </div>
+        </div>
         {questionSet}
         <div className="border-2 border-gray-900 rounded py-2 flex">
           <svg
@@ -139,10 +294,25 @@ export default function Edit() {
         </div>
       </div>
       <div className="justify-center flex mb-5">
-        <button onClick={handleSave} className="rounded-md bg-green-500 px-7 py-2">Save</button>
+        <button onClick={handleSave} className="rounded-md bg-green-500 px-7 py-2 hover:bg-green-400">Save</button>
         <br className="m-2"/>
-        <button className="bg-rose-500 px-6 py-2 rounded-md">Cancel</button>
+        <button onClick={() => setShowModal(true)} className="bg-rose-500 px-6 py-2 rounded-md hover:bg-rose-400">Cancel</button>
       </div>
+      {showAlert ? (
+        <StickyAlert
+          closehandler={() => setShowAlert(false)}
+          title={alertData.title}
+          text={alertData.message}
+          color={alertData.color}
+          show={showAlert}
+        />
+      ) : null}
+      {showModal ? (
+        <ConfirmationModal
+          closehandler={() => setShowModal(false)}
+        />
+      ) : null}
+      <br className="my-7"/>
     </div>
   )
 }
