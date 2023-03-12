@@ -15,16 +15,11 @@ function StickyAlert({
 }) {
     const [fade, setFade] = React.useState(false);
     useEffect(() => {
-        if (show) {
-            setFade(true);
-        } else {
-            setFade(false);
-        }
-        console.log(fade);
-    }, [show]);
+        setFade(true);
+    }, []);
 
     return (
-        <div className={`delay-10000ms] transition-all duration-300 ${fade ? "opacity-0" : "opacity-100"}`}>
+        <div className={`delay-[2000ms] transition-all duration-300 ${fade ? "opacity-0" : "opacity-100"}`}>
             <div
                 className={"mx-7 fixed mb-4 rounded-md border-0 px-4 py-4 text-md text-white bottom-0 left-0 right-0 bg-" + color + "-500"}
             >
