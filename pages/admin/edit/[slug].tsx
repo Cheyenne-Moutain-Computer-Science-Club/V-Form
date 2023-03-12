@@ -52,8 +52,9 @@ export default function Edit() {
   // Unix epoch
   const [date, setDate] = useState(0);
 
-  // Alert
+  // Alerts
   const [showAlert, setShowAlert] = useState(false);
+  const [alertData, setAlertData] = useState({title: "", message: "", color: ""});
 
 
   // Whitelist option preparation
@@ -130,14 +131,26 @@ export default function Edit() {
 
   // Database outgoing interaction
   const handleSave = async () => {
-    setShowAlert(false);
-    // TODO: remove blank lines
-    // TODO: confirmation
-    const options = prepareOptions();
+    try {
+      // Errors
+      // Date out of range
+      // if (date > 29379481200000 || date < 1577862000000) {
+      //   throw "Date out of range: please select a date between today and 2900-12-31";
+      // }
 
-    const docRef = doc(db, "forms", `${slug}`);
-    await setDoc(docRef, {questions: questionContent, options: options}, {merge: true});
-    setShowAlert(true);
+      setAlertData({title: "Form saved -", message: "Last saved: " + new Date().toLocaleString(), color: "green"});
+      setShowAlert(false);
+      // TODO: remove blank lines
+      // TODO: confirmation
+      const options = prepareOptions();
+
+      const docRef = doc(db, "forms", `${slug}`);
+      await setDoc(docRef, {questions: questionContent, options: options}, {merge: true});
+    } catch (error) {
+      setAlertData({title: "Error -", message: error as string, color: "rose"});
+    } finally {
+      setShowAlert(true);
+    }
   }
 
   const addQuestion = () => {
@@ -251,8 +264,8 @@ export default function Edit() {
                 type="datetime-local"
                 onChange={(event) => onChangeDate(event)}
                 defaultValue={new Date(date).toISOString().slice(0, -8)}
-                min="2020-06-12T00:00"
-                max="2090-06-12T00:00"
+                min="2020-01-01T00:00"
+                max="2100-12-31T00:00"
                 className="bg-gray-200 ml-2"/>
               </label>
             </div>
@@ -283,9 +296,9 @@ export default function Edit() {
       {showAlert ? (
         <StickyAlert
           closehandler={() => setShowAlert(false)}
-          title="Form saved -"
-          text={"Last saved: " + new Date().toLocaleString()}
-          color="green"
+          title={alertData.title}
+          text={alertData.message}
+          color={alertData.color}
           show={showAlert}
         />
       ) : null}
