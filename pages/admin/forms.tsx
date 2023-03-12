@@ -113,10 +113,11 @@ function Admin() {
 			slug: formID,
 			options: {
 				active: true,
-				end: null,
+				endDate: new Date(),
 				submits: 1,
 			},
 			questions: [],
+			
 		};
 
 		const formRef = doc(firestore, "forms", formID);

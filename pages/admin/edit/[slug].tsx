@@ -4,6 +4,7 @@ import { collection, getFirestore, doc, setDoc, getDoc, getDocs, DocumentData, T
 import React, { useState, useEffect } from "react";
 import { v4 as uuidv4 } from "uuid";
 import EditDropdownTypeSheet from "@/components/questionTypes/editable/EditDropdownFromSheet";
+import StickyAlert from "@/components/stickyAlert";
 
 const db = getFirestore(app);
 
@@ -20,7 +21,7 @@ interface question {
 interface options {
   active: boolean;
   whitelist: string[]; // Array of strings with whitelist ids
-  endDate: any;
+  endDate: Timestamp;
 }
 
 const onMount = async (slug: any) => {
@@ -38,7 +39,7 @@ const onMount = async (slug: any) => {
 export default function Edit() {
   const router = useRouter();
   // Get URL slug
-  const { slug } = router.query /*?? ""*/;
+  const { slug } = router.query /*?? ""*/
 
   const [formData, setFormData] = useState(Object);
   const [questionContent, setQuestionContent] = useState(Array<DocumentData>);
@@ -50,6 +51,9 @@ export default function Edit() {
   const [active, setActive] = useState(Boolean);
   // Unix epoch
   const [date, setDate] = useState(0);
+
+  // Alert
+  const [showAlert, setShowAlert] = useState(false);
 
 
   // Whitelist option preparation
@@ -126,12 +130,14 @@ export default function Edit() {
 
   // Database outgoing interaction
   const handleSave = async () => {
+    setShowAlert(false);
     // TODO: remove blank lines
     // TODO: confirmation
     const options = prepareOptions();
 
     const docRef = doc(db, "forms", `${slug}`);
     await setDoc(docRef, {questions: questionContent, options: options}, {merge: true});
+    setShowAlert(true);
   }
 
   const addQuestion = () => {
@@ -274,6 +280,16 @@ export default function Edit() {
         <br className="m-2"/>
         <button className="bg-rose-500 px-6 py-2 rounded-md hover:bg-rose-400">Cancel</button>
       </div>
+      {showAlert ? (
+        <StickyAlert
+          closehandler={() => setShowAlert(false)}
+          title="Form saved -"
+          text={"Last saved: " + new Date().toLocaleString()}
+          color="green"
+          show={showAlert}
+        />
+      ) : null}
+      <br className="my-7"/>
     </div>
   )
 }
