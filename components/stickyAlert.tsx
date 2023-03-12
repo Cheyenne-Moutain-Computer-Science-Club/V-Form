@@ -20,7 +20,6 @@ function StickyAlert({
         } else {
             setFade(false);
         }
-        console.log(fade);
     }, [show]);
 
     return (
