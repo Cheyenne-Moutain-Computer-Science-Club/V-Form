@@ -4,6 +4,7 @@ import { collection, getFirestore, doc, setDoc, getDoc, getDocs, DocumentData, T
 import React, { useState, useEffect } from "react";
 import { v4 as uuidv4 } from "uuid";
 import EditDropdownTypeSheet from "@/components/questionTypes/editable/EditDropdownFromSheet";
+import StickyAlert from "@/components/stickyAlert";
 
 const db = getFirestore(app);
 
@@ -20,7 +21,7 @@ interface question {
 interface options {
   active: boolean;
   whitelist: string[]; // Array of strings with whitelist ids
-  endDate: any;
+  endDate: Timestamp;
 }
 
 const onMount = async (slug: any) => {
@@ -38,7 +39,7 @@ const onMount = async (slug: any) => {
 export default function Edit() {
   const router = useRouter();
   // Get URL slug
-  const { slug } = router.query /*?? ""*/;
+  const { slug } = router.query /*?? ""*/
 
   const [formData, setFormData] = useState(Object);
   const [questionContent, setQuestionContent] = useState(Array<DocumentData>);
@@ -50,6 +51,10 @@ export default function Edit() {
   const [active, setActive] = useState(Boolean);
   // Unix epoch
   const [date, setDate] = useState(0);
+
+  // Alerts
+  const [showAlert, setShowAlert] = useState(false);
+  const [alertData, setAlertData] = useState({title: "", message: "", color: ""});
 
 
   // Whitelist option preparation
@@ -126,12 +131,26 @@ export default function Edit() {
 
   // Database outgoing interaction
   const handleSave = async () => {
-    // TODO: remove blank lines
-    // TODO: confirmation
-    const options = prepareOptions();
+    try {
+      // Errors
+      // Date out of range
+      // if (date > 29379481200000 || date < 1577862000000) {
+      //   throw "Date out of range: please select a date between today and 2900-12-31";
+      // }
 
-    const docRef = doc(db, "forms", `${slug}`);
-    await setDoc(docRef, {questions: questionContent, options: options}, {merge: true});
+      setAlertData({title: "Form saved -", message: "Last saved: " + new Date().toLocaleString(), color: "green"});
+      setShowAlert(false);
+      // TODO: remove blank lines
+      // TODO: confirmation
+      const options = prepareOptions();
+
+      const docRef = doc(db, "forms", `${slug}`);
+      await setDoc(docRef, {questions: questionContent, options: options}, {merge: true});
+    } catch (error) {
+      setAlertData({title: "Error -", message: error as string, color: "rose"});
+    } finally {
+      setShowAlert(true);
+    }
   }
 
   const addQuestion = () => {
@@ -245,8 +264,8 @@ export default function Edit() {
                 type="datetime-local"
                 onChange={(event) => onChangeDate(event)}
                 defaultValue={new Date(date).toISOString().slice(0, -8)}
-                min={new Date().toString()}
-                max="2025-06-12T00:00"
+                min="2020-01-01T00:00"
+                max="2100-12-31T00:00"
                 className="bg-gray-200 ml-2"/>
               </label>
             </div>
@@ -274,6 +293,16 @@ export default function Edit() {
         <br className="m-2"/>
         <button className="bg-rose-500 px-6 py-2 rounded-md hover:bg-rose-400">Cancel</button>
       </div>
+      {showAlert ? (
+        <StickyAlert
+          closehandler={() => setShowAlert(false)}
+          title={alertData.title}
+          text={alertData.message}
+          color={alertData.color}
+          show={showAlert}
+        />
+      ) : null}
+      <br className="my-7"/>
     </div>
   )
 }

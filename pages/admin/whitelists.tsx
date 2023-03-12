@@ -14,6 +14,7 @@ import { QuerySnapshot } from "firebase/firestore";
 import Footer from "@/components/footer";
 import { signIn } from "@/lib/auth";
 import WhitelistSplash from "@/components/creation-tools/WhitelistSplash";
+import Link from "next/link";
 
 export default function Whitelists() {
 	const [user, userLoading, userError] = useAuthState(auth);
