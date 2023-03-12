@@ -286,6 +286,7 @@ export default function Edit() {
           title="Form saved -"
           text={"Last saved: " + new Date().toLocaleString()}
           color="green"
+          show={showAlert}
         />
       ) : null}
       <br className="my-7"/>
