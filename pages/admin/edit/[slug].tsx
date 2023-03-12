@@ -251,7 +251,7 @@ export default function Edit() {
                 type="datetime-local"
                 onChange={(event) => onChangeDate(event)}
                 defaultValue={new Date(date).toISOString().slice(0, -8)}
-                min={new Date().toString()}
+                min={new Date(Date.now() - 24 * 3600000).toString()}
                 max="2025-06-12T00:00"
                 className="bg-gray-200 ml-2"/>
               </label>
