@@ -4,7 +4,9 @@ import { collection, getFirestore, doc, setDoc, getDoc, getDocs, DocumentData, T
 import React, { useState, useEffect } from "react";
 import { v4 as uuidv4 } from "uuid";
 import EditDropdownTypeSheet from "@/components/questionTypes/editable/EditDropdownFromSheet";
-import StickyAlert from "@/components/stickyAlert";
+import StickyAlert from "@/components/errors-and-confirmation/StickyAlert";
+import ConfirmationModal from "@/components/errors-and-confirmation/ConfirmationModal";
+import Link from "next/link";
 
 const db = getFirestore(app);
 
@@ -55,6 +57,9 @@ export default function Edit() {
   // Alerts
   const [showAlert, setShowAlert] = useState(false);
   const [alertData, setAlertData] = useState({title: "", message: "", color: ""});
+
+  // Confirmation modal
+  const [showModal, setShowModal] = useState(false);
 
 
   // Whitelist option preparation
@@ -291,7 +296,7 @@ export default function Edit() {
       <div className="justify-center flex mb-5">
         <button onClick={handleSave} className="rounded-md bg-green-500 px-7 py-2 hover:bg-green-400">Save</button>
         <br className="m-2"/>
-        <button className="bg-rose-500 px-6 py-2 rounded-md hover:bg-rose-400">Cancel</button>
+        <button onClick={() => setShowModal(true)} className="bg-rose-500 px-6 py-2 rounded-md hover:bg-rose-400">Cancel</button>
       </div>
       {showAlert ? (
         <StickyAlert
@@ -300,6 +305,11 @@ export default function Edit() {
           text={alertData.message}
           color={alertData.color}
           show={showAlert}
+        />
+      ) : null}
+      {showModal ? (
+        <ConfirmationModal
+          closehandler={() => setShowModal(false)}
         />
       ) : null}
       <br className="my-7"/>
