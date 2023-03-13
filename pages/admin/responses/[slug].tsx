@@ -57,10 +57,10 @@ function SingleResponse(
                 const prompt = ques.title + ": " + ques.description;
                 
                 // userItemData: An array of all UserOptions for the current question
-                const userItemData = ques.items.map((currentItem) => {
+                const userItemData = ques.items.map((currentItem, j) => {
                     // itemResponses: An array of all responses to the current item
                     const itemResponses = responseData.map((response) => {return response.questionResponses[i]});
-                    const numOccurences = itemResponses.filter((response) => {response === currentItem}).length;
+                    const numOccurences = itemResponses.filter((response) => {return response === currentItem}).length;
                     // Make options using UserOptions
                     const options: UserOptions = {
                         optionText: currentItem,
@@ -75,9 +75,9 @@ function SingleResponse(
 
                 let question: ResponseQuestion = new ResponseQuestion(prompt, userItemData, num_responses);
                 question.sortOptions();
+                console.log(question);
                 return question;
             });
-
         })();
     }, []);
     // console.log(responseData);

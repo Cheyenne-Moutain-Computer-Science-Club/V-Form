@@ -38,4 +38,9 @@ export class ResponseQuestion {
     public sortOptions() {
         this.options.sort((a, b) => b.numChosen - a.numChosen);
     }
+    public getPercent(itemIndex: number): number {
+        let percent = this.options[itemIndex].numChosen / this.num_total_responses;
+        percent = Math.round(percent * 1000) / 10;
+        return percent; 
+    }
 }
