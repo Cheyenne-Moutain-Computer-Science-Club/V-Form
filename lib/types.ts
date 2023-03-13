@@ -27,3 +27,15 @@ export interface whitelist {
 	user: string;
 	emails: string[];
 }
+
+export interface Response {
+	form: string
+	questionResponses: string[],
+	uid: string
+}
+
+// Used for response viewing
+export interface UserOptions {
+    optionText: string,
+    numChosen: number
+}
