@@ -14,7 +14,7 @@ export default function Responses() {
 	const [user, userLoading, userError] = useAuthState(auth);
 	const [data, setData] = useState([] as Form[]);
 
-	const router: any = useRouter();
+	const router = useRouter();
 
 	useEffect(() => {
 		if (user) {
@@ -93,7 +93,7 @@ export default function Responses() {
 								Back
 							</Link>
 							<h1 className="text-4xl font-bold text-gray-900">
-								My Forms
+								Responses
 							</h1>
 						</div>
 						<div className="col-span-5 col-start-3">
@@ -106,7 +106,7 @@ export default function Responses() {
 							))}
 							{data.length === 0 && (
 								<h4 className="font-light text-gray-500">
-									Make a new form with the plus button
+									Select a form
 								</h4>
 							)}
 						</div>
