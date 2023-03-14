@@ -28,7 +28,7 @@ export default function EditPage(
 ) {
 	const formData = props.form;
 
-	const [FormOptions, setFormOptions] = useState(props.form.options);
+	const [formOptions, setFormOptions] = useState(props.form.options);
 	const [questionContent, setQuestionContent] = useState(
 		props.form.questions
 	);
@@ -116,30 +116,27 @@ export default function EditPage(
 
 	// Database outgoing interaction
 	const handleSave = async () => {
+		let spreadOptionData = { ...formOptions };
+		let spreadQuestionData = [...questionContent];
+
+		spreadOptionData.endDate = Timestamp.fromDate(
+			new Date(spreadOptionData.endDate)
+		);
+
+		let promise = setDoc(
+			doc(firestore, "forms", `${props.slug}`),
+			{ questions: spreadQuestionData, options: spreadOptionData },
+			{ merge: true }
+		);
 		window.removeEventListener("beforeunload", unloadHandler);
 		toast.dismiss(toastId.current);
 		toastId.current = undefined;
-		toast.success("Changes saved!", {
-			position: "bottom-left",
-			autoClose: 5000,
-			hideProgressBar: false,
-			closeOnClick: true,
-			pauseOnHover: true,
-			draggable: true,
-			progress: undefined,
-			theme: "colored",
+		toast.promise(promise, {
+			pending: "Saving...",
+			success: "Changes saved!",
+			error: "There was an error saving your changes",
 		});
-		// TODO: remove blank lines
-		// TODO: confirmation
-		// console.log(questionContent);
-		// const options = prepareOptions(); // TODO: Rewrite from scratch
-
-		// const docRef = doc(firestore, "forms", `${props.slug}`);
-		// await setDoc(
-		// 	docRef,
-		// 	{ questions: questionContent, options: options },
-		// 	{ merge: true }
-		// );
+		await promise;
 	};
 
 	const addQuestion = () => {
@@ -278,7 +275,7 @@ export default function EditPage(
 					</button>
 					<ToastContainer
 						position="bottom-left"
-						autoClose={false}
+						autoClose={5000}
 						newestOnTop
 						closeOnClick
 						rtl={false}
@@ -347,6 +344,7 @@ export async function getServerSideProps(ctx: GetServerSidePropsContext) {
 			props: {
 				form,
 				whitelists,
+				slug: ctx.params?.slug,
 			},
 		};
 	} catch (err) {

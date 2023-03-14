@@ -8,7 +8,7 @@ import { Form } from "@/lib/types";
 import FormSplash from "@/components/creation-tools/FormSplash";
 import Link from "next/link";
 
-function Admin() {
+export default function Admin() {
 	const [user, userLoading, userError] = useAuthState(auth);
 	const [forms, setForms] = useState([] as Form[]);
 
@@ -183,5 +183,3 @@ function Admin() {
 		</div>
 	);
 }
-
-export default Admin;
