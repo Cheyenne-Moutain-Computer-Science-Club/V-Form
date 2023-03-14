@@ -14,7 +14,7 @@ export default function LoginPageState(
 	const [user, authLoading, authError] = useAuthState(auth);
 
 	if (user) {
-		if (props.slug) router.push("/form/" + props.slug);
+		if (props.slug) router.push("/" + props.slug);
 		else router.push("/");
 	}
 

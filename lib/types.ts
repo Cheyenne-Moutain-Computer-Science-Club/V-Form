@@ -8,6 +8,7 @@ export interface Form {
 }
 
 export interface Question {
+	[key: string]: string | boolean | string[];
 	title: string;
 	description: string;
 	placeholder: string;
@@ -17,6 +18,7 @@ export interface Question {
 }
 
 export interface Whitelist {
+	id: string;
 	name: string;
 	user: string;
 	emails: string[];
@@ -24,7 +26,7 @@ export interface Whitelist {
 
 export interface FormOptions {
 	active: boolean;
-	endDate: Date;
+	endDate: string;
 	submits: number;
 	user: string;
 	whitelists: DocumentReference<Whitelist>;

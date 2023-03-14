@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { useAuthState } from "react-firebase-hooks/auth";
 import { firestore, auth } from "@lib/firebase";
-import { collection, getDocs, query, where } from "firebase/firestore";
+import { collection, getDocs, orderBy, query, where } from "firebase/firestore";
 import Footer from "@/components/footer";
 import { signIn } from "@/lib/auth";
 import { Form } from "@/lib/types";
@@ -10,25 +10,26 @@ import Link from "next/link";
 
 function Admin() {
 	const [user, userLoading, userError] = useAuthState(auth);
-	const [data, setData] = useState([] as Form[]);
+	const [forms, setForms] = useState([] as Form[]);
 
 	useEffect(() => {
 		if (user) {
 			getDocs(
 				query(
 					collection(firestore, "forms"),
-					where("options.user", "==", user?.uid ?? "")
+					where("options.user", "==", user?.uid ?? ""),
+					orderBy("options.endDate", "desc")
 				)
 			).then((querySnapshot) => {
 				const data = querySnapshot.docs.map((doc) =>
 					doc.data()
 				) as Form[];
-				setData(data);
+				setForms(data);
 			});
 		}
 	}, [user]);
 
-	if (userLoading || !data) {
+	if (userLoading || !forms) {
 		return (
 			<div className="flex h-screen flex-col justify-between">
 				<main className="grid h-full items-center">
@@ -167,7 +168,7 @@ function Admin() {
 							Recent Forms
 						</h1>
 						<div className="col-span-5 col-start-3">
-							{data.map((form, i) => (
+							{forms.map((form, i) => (
 								<FormSplash
 									header={form.header}
 									slug={"1"}
