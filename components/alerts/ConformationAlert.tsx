@@ -13,9 +13,7 @@ export default function ConfirmationModal({
 				<div className="relative my-6 mx-auto w-auto max-w-sm">
 					<div className="relative flex w-full flex-col rounded-lg border-0 bg-white shadow-lg outline-none focus:outline-none">
 						<div className="flex items-start justify-between rounded-t border-b border-solid border-slate-200 p-5">
-							<h3 className="text-3xl font-semibold">
-								Cancel changes?
-							</h3>
+							<h3 className="text-3xl font-semibold">Go Back?</h3>
 							<button
 								className="float-right ml-auto border-0 bg-transparent p-1 text-3xl font-semibold leading-none text-black opacity-5 outline-none focus:outline-none"
 								onClick={closehandler}
@@ -27,8 +25,8 @@ export default function ConfirmationModal({
 						</div>
 						<div className="relative flex-auto p-6">
 							<p className="my-4 text-lg leading-relaxed text-slate-500">
-								Are you sure you want to cancel? All changes
-								will be lost, and you will be redirected to the
+								Are you sure you want to proceed? All unsaved
+								changes will be lost, and you will return to the
 								dashboard.
 							</p>
 						</div>

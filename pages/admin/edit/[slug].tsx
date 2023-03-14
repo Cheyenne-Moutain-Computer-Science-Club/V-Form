@@ -21,6 +21,7 @@ import Footer from "@/components/footer";
 import { Id, ToastContainer } from "react-toastify";
 import { toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
+import ConfirmationModal from "@/components/alerts/ConformationAlert";
 
 export default function EditPage(
 	props: InferGetServerSidePropsType<typeof getServerSideProps>
@@ -34,6 +35,7 @@ export default function EditPage(
 
 	const toastId = useRef<undefined | Id>();
 	const [showFormOptions, setShowFormOptions] = useState(false);
+	const [showModal, setShowModal] = useState(false);
 
 	// Whitelist option preparation
 	// const whitelistAll = () => {
@@ -188,6 +190,27 @@ export default function EditPage(
 	return (
 		<div className="flex h-screen flex-col justify-between">
 			<main className="mt-4 mb-auto grid grid-cols-7">
+				<button
+					onClick={() => setShowModal(true)}
+					className="font-xl group col-span-1 col-start-2 flex items-center rounded bg-neutral-50 px-2 font-bold text-gray-900 hover:bg-gray-900 hover:text-neutral-50"
+				>
+					<svg
+						aria-hidden="true"
+						fill="none"
+						stroke="currentColor"
+						strokeWidth={2}
+						viewBox="0 0 24 24"
+						xmlns="http://www.w3.org/2000/svg"
+						className="h-8 w-8"
+					>
+						<path
+							d="M15.75 19.5L8.25 12l7.5-7.5"
+							strokeLinecap="round"
+							strokeLinejoin="round"
+						/>
+					</svg>
+					Back
+				</button>
 				<h1 className="col-span-1 col-start-4 flex justify-center text-3xl font-semibold">
 					{formData?.header}
 				</h1>
@@ -239,7 +262,7 @@ export default function EditPage(
 					<h2 className="mx-2 font-semibold">New Question</h2>
 				</div>
 
-				<div className="col-span-1 col-start-4 mb-5 flex justify-between">
+				<div className="col-span-1 col-start-4 mb-5 flex items-center justify-center">
 					<button
 						onClick={handleSave}
 						className="rounded border-2 border-gray-900 bg-green-300 px-7 py-2 hover:bg-green-500"
@@ -256,6 +279,11 @@ export default function EditPage(
 						draggable
 						theme="colored"
 					/>
+					{showModal ? (
+						<ConfirmationModal
+							closehandler={() => setShowModal(false)}
+						/>
+					) : null}
 				</div>
 			</main>
 			<Footer />
