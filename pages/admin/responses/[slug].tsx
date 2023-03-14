@@ -1,17 +1,12 @@
 import Link from "next/link";
-import { useAuthState } from "react-firebase-hooks/auth";
-import { Form, UserOptions, Question, Response } from "@/lib/types";
+import { UserOptions, Question, Response } from "@/lib/types";
 import { ResponseQuestion } from "@/lib/responseManagement";
 import { useState, useEffect } from "react";
-import { auth } from "@/lib/firebase";
-import { useRouter } from "next/router";
 import { GetServerSidePropsContext } from "next";
 import { InferGetServerSidePropsType } from "next";
 import { doc, getDocs, getDoc, query, collection, where } from "firebase/firestore";
 import Footer from "@/components/footer";
 import { firestore } from "@/lib/firebase";
-import FormSplash from "@/components/creation-tools/FormSplash";
-import { signIn } from "@/lib/auth";
 
 function SingleResponse(
     props: InferGetServerSidePropsType<typeof getServerSideProps>
@@ -68,7 +63,6 @@ function SingleResponse(
 
                 let question: ResponseQuestion = new ResponseQuestion(prompt, userItemData, num_responses);
                 question.sortOptions();
-                // console.log(question);
                 return question;
 
             });
