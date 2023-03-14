@@ -21,6 +21,7 @@ function SingleResponse(
     // const [responseData, setResponseData] = useState([] as Form[])
     // Array<questions: Array<UserOptions[], num_total_responses>>
     const [questions, setQuestions] = useState(Array<ResponseQuestion>);
+    const [showAllOptions, setShowAllOptions] = useState(Array<Boolean>);
 
 
     useEffect(() => {
@@ -40,13 +41,13 @@ function SingleResponse(
 					doc.data()
 				) as Response[];
                 // setResponseData(data);
-                console.log(responseData);
+                // console.log(responseData);
             }
 
             // Questions
             // form: The form being viewed
             const form = await getDoc(doc(firestore, "forms", `${props.slug}`));
-            console.log(form.data());
+            // console.log(form.data());
             // A new instance of ResponseQuestion will be created for each question
             // allQuestions: An array of all ResponseQuestions that will be used for the questions state
             // let allQuestions: Array<ResponseQuestion> = [];
@@ -75,16 +76,104 @@ function SingleResponse(
 
                 let question: ResponseQuestion = new ResponseQuestion(prompt, userItemData, num_responses);
                 question.sortOptions();
-                console.log(question);
+                // console.log(question);
                 return question;
+
             });
+            setQuestions(allQuestions);
+
+            // Prepare state
+            setShowAllOptions(Array(allQuestions.length).fill(false));
         })();
     }, []);
-    // console.log(responseData);
+    // console.log(responseData); 
 
-  return (
-    <div>Responses</div>
-  )
+    const handleShowOptions = (i: number) => {
+        const newShowAllOptions = [...showAllOptions];
+        newShowAllOptions[i] = !newShowAllOptions[i];
+        setShowAllOptions(newShowAllOptions);
+    }
+
+    const responseSet = questions.map((question, i) => {
+        const optionsToRender = showAllOptions[i] ? question.getOptions() : question.getOptions().slice(0, 5);
+        const buttonState = question.getOptions().length <=5 ? false : showAllOptions[i] ? "Show Less" : "Show More";
+
+
+        return (
+            <div className="my-8 border-2 border-gray-900 p-4 rounded flex flex-col">
+                <h2 className="font-semibold">{i + 1}. {question.getQuestionText()}</h2>
+                <div className="my-2">
+                    {optionsToRender.map((option, j) => {
+                        const percent = question.getPercent(j);
+                        return (
+                            <div className="mt-5 flex items-start flex-col">
+                                <h3>{option.optionText}</h3>
+                                {/* <p>{option.numChosen}</p> */}
+                                <div className="relative w-1/4 pt-1">
+                                    <div className="flex mb-2 items-center justify-between">
+                                        <div className="justify-between">
+                                            <span className="text-xs font-semibold inline-block">
+                                                {option.numChosen}/{question.getNumTotalResponses()}
+                                            </span>
+                                            
+                                        </div>
+                                    </div>
+                                    <div className="overflow-hidden h-2 mb-4 text-xs flex rounded bg-green-200">
+                                        <div style={{ width: percent.toString() + "%" }} className="shadow-none flex flex-col text-center whitespace-nowrap text-white justify-center bg-green-500"></div>
+                                    </div>
+                                    <span className="text-xs font-semibold inline-block text-green-600">
+                                        {percent}%
+                                    </span>
+                                </div>
+                            </div>
+                        );
+                    })}
+                </div>
+                {buttonState && (<button onClick={() => handleShowOptions(i)} className="text-s text-gray-500">{buttonState}</button>)}
+            </div>
+        );
+    });
+
+    return (
+        <div className="flex h-screen flex-col justify-between">
+            <main className="mb-auto">
+                <div>
+                    <div className="mt-20 grid grid-cols-9 grid-rows-1">
+                        <div className="col-span-5 col-start-3 flex w-full justify-between">
+                            <Link
+                                href="/admin/responses"
+                                className="font-xl group flex items-center rounded bg-neutral-50 px-2 font-bold text-gray-900 hover:bg-gray-900 hover:text-neutral-50"
+                            >
+                                <svg
+                                    aria-hidden="true"
+                                    fill="none"
+                                    stroke="currentColor"
+                                    strokeWidth={2}
+                                    viewBox="0 0 24 24"
+                                    xmlns="http://www.w3.org/2000/svg"
+                                    className="h-8 w-8"
+                                >
+                                    <path
+                                        d="M15.75 19.5L8.25 12l7.5-7.5"
+                                        strokeLinecap="round"
+                                        strokeLinejoin="round"
+                                    />
+                                </svg>
+                                Back
+                            </Link>
+                            <h1 className="text-4xl font-bold text-gray-900">
+                                {props.slug}
+                            </h1>
+                        </div>
+                    </div>
+                    <div className="mt-10">
+                        {responseSet}
+                    </div>
+                </div>
+            </main>
+            <Footer />
+        </div>
+    )
 }
 
 export function getServerSideProps(context: GetServerSidePropsContext) {
