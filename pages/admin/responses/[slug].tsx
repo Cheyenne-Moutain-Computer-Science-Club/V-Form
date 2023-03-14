@@ -16,13 +16,8 @@ import { signIn } from "@/lib/auth";
 function SingleResponse(
     props: InferGetServerSidePropsType<typeof getServerSideProps>
 ) {
-    const router = useRouter();
-
-    // const [responseData, setResponseData] = useState([] as Form[])
-    // Array<questions: Array<UserOptions[], num_total_responses>>
     const [questions, setQuestions] = useState(Array<ResponseQuestion>);
     const [showAllOptions, setShowAllOptions] = useState(Array<Boolean>);
-
 
     useEffect(() => {
         (async () => {
@@ -40,14 +35,11 @@ function SingleResponse(
                 responseData = responses.docs.map((doc) =>
 					doc.data()
 				) as Response[];
-                // setResponseData(data);
-                // console.log(responseData);
             }
 
             // Questions
             // form: The form being viewed
             const form = await getDoc(doc(firestore, "forms", `${props.slug}`));
-            // console.log(form.data());
             // A new instance of ResponseQuestion will be created for each question
             // allQuestions: An array of all ResponseQuestions that will be used for the questions state
             // let allQuestions: Array<ResponseQuestion> = [];
@@ -86,7 +78,7 @@ function SingleResponse(
             setShowAllOptions(Array(allQuestions.length).fill(false));
         })();
     }, []);
-    // console.log(responseData); 
+ 
 
     const handleShowOptions = (i: number) => {
         const newShowAllOptions = [...showAllOptions];
@@ -100,7 +92,7 @@ function SingleResponse(
 
 
         return (
-            <div className="my-8 border-2 border-gray-900 p-4 rounded flex flex-col">
+            <div className="mx-40 my-8 border-2 border-gray-900 p-4 rounded flex flex-col">
                 <h2 className="font-semibold">{i + 1}. {question.getQuestionText()}</h2>
                 <div className="my-2">
                     {optionsToRender.map((option, j) => {
@@ -108,7 +100,6 @@ function SingleResponse(
                         return (
                             <div className="mt-5 flex items-start flex-col">
                                 <h3>{option.optionText}</h3>
-                                {/* <p>{option.numChosen}</p> */}
                                 <div className="relative w-1/4 pt-1">
                                     <div className="flex mb-2 items-center justify-between">
                                         <div className="justify-between">
