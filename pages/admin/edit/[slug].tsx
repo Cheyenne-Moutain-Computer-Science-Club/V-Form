@@ -37,6 +37,11 @@ export default function EditPage(
 	const [showFormOptions, setShowFormOptions] = useState(false);
 	const [showModal, setShowModal] = useState(false);
 
+	const unloadHandler = (event: BeforeUnloadEvent) => {
+		event.preventDefault();
+		event.returnValue = "";
+	};
+
 	// Whitelist option preparation
 	// const whitelistAll = () => {
 	// 	// Get all possible whitelists
@@ -95,6 +100,7 @@ export default function EditPage(
 		contentCopy[i] = questionData;
 		setQuestionContent(contentCopy);
 		if (!toastId.current) {
+			window.addEventListener("beforeunload", unloadHandler);
 			toastId.current = toast.warn("Unsaved Changes", {
 				position: "bottom-left",
 				autoClose: false,
@@ -110,6 +116,7 @@ export default function EditPage(
 
 	// Database outgoing interaction
 	const handleSave = async () => {
+		window.removeEventListener("beforeunload", unloadHandler);
 		toast.dismiss(toastId.current);
 		toastId.current = undefined;
 		toast.success("Changes saved!", {
