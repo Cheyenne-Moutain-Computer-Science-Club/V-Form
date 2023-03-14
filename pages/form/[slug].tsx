@@ -58,27 +58,29 @@ export default function Form(
 			});
 	}, [user]);
 
-	useEffect(() => {
-		if (user && value) {
-			getDoc(value.options.whitelist).then((result) => {
-				console.log(
-					value.options.whitelist,
-					result,
-					result.exists(),
-					result.data()
-				);
-				if (result.exists() && user.email) {
-					let data = result.data() as whitelist;
-					if (!data.emails.includes(user.email)) {
-						Router.push({
-							pathname: "/not-allowed",
-							query: { slug: props.slug },
-						});
-					}
-				}
-			});
-		}
-	}, [user, value]);
+	// TODO - whitelist
+
+	// useEffect(() => {
+	// 	if (user && value) {
+	// 		getDoc(value.options.whitelist).then((result) => {
+	// 			console.log(
+	// 				value.options.whitelist,
+	// 				result,
+	// 				result.exists(),
+	// 				result.data()
+	// 			);
+	// 			if (result.exists() && user.email) {
+	// 				let data = result.data() as whitelist;
+	// 				if (!data.emails.includes(user.email)) {
+	// 					Router.push({
+	// 						pathname: "/not-allowed",
+	// 						query: { slug: props.slug },
+	// 					});
+	// 				}
+	// 			}
+	// 		});
+	// 	}
+	// }, [user, value]);
 
 	if (authLoading || dataLoading) {
 		return (
@@ -237,7 +239,7 @@ export default function Form(
 
 						<button
 							onClick={() => sumbitForm()}
-							className="hover:bg-accent hover:text-accent col-start-5 h-12 w-36 rounded border-2 border-gray-900 transition hover:font-bold"
+							className="col-start-5 h-12 w-36 rounded border-2 border-gray-900 transition hover:bg-gray-900 hover:text-neutral-50"
 						>
 							Submit
 						</button>
