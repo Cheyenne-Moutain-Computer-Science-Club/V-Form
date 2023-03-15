@@ -1,16 +1,16 @@
 import Footer from "@/components/footer";
 import ReactConfetti from "react-confetti";
+import { useEffect, useState } from "react";
 
 export default function Submitted() {
-	let width,
-		height = 0;
-	try {
-		width = window.innerWidth;
-		height = window.innerHeight;
-	} catch (e) {
-		width = 3860;
-		height = 2140;
-	}
+	const [width, setWidth] = useState(0);
+	const [height, setHeight] = useState(0);
+
+	useEffect(() => {
+		setWidth(window.innerWidth);
+		setHeight(window.innerHeight);
+	}, []);
+
 	return (
 		<div className="flex h-screen flex-col justify-between">
 			<ReactConfetti width={width} height={height} numberOfPieces={400} />

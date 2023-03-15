@@ -18,7 +18,7 @@
 	} */
 
 	.bg-accent {
-		@apply bg-gradient-to-r from-amber-300 to-emerald-300;
+		@apply bg-gradient-to-r from-red-500 to-orange-500;
 	}
 
 	.text-accent {

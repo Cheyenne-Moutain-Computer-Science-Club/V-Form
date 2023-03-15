@@ -1,5 +1,4 @@
 import { useState, useEffect, useRef } from "react";
-import EditDropdownTypeSheet from "../questionTypes/editable/EditDropdownFromSheet";
 
 export default function SearchableDropdown({
 	options,
@@ -56,27 +55,25 @@ export default function SearchableDropdown({
 
 	return (
 		<div className="w-full py-2">
-			<div className="">
-				<input
-					ref={inputRef}
-					type="text"
-					value={getDisplayValue()}
-					name="searchTerm"
-					onChange={(e) => {
-						setQuery(e.target.value);
-						handleChange("");
-						drop(e);
-					}}
-					onClick={toggle}
-					placeholder={placeholder}
-					className={`h-8 w-80 rounded border-2 border-neutral-800 bg-neutral-50 p-2 text-gray-900 outline-none placeholder:italic placeholder:text-gray-400`}
-				/>
-			</div>
+			<input
+				ref={inputRef}
+				type="text"
+				value={getDisplayValue()}
+				name="searchTerm"
+				onChange={(e) => {
+					setQuery(e.target.value);
+					handleChange("");
+					drop(e);
+				}}
+				onClick={toggle}
+				placeholder={placeholder}
+				className={`h-12 w-96 rounded border-b-2 border-neutral-900 bg-neutral-200 p-2 text-gray-900 outline-none placeholder:italic placeholder:text-gray-400`}
+			/>
 
 			{isOpen && (
 				<div
 					className={
-						"absolute max-h-48 w-80 overflow-auto rounded border-2 border-neutral-800 bg-neutral-50 text-gray-900"
+						"absolute max-h-48 w-96 overflow-auto rounded border-2 border-t-0 border-neutral-800 bg-neutral-50 text-gray-900"
 					}
 				>
 					{filter(options).map((option: string, index: number) => {
@@ -94,6 +91,11 @@ export default function SearchableDropdown({
 							</div>
 						);
 					})}
+					{filter(options).length === 0 && (
+						<div className="bg-gray-200 px-2 py-2 text-gray-400">
+							No options found
+						</div>
+					)}
 				</div>
 			)}
 		</div>

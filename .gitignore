@@ -35,4 +35,5 @@ yarn-error.log*
 *.tsbuildinfo
 next-env.d.ts
 
-v-form-cb250-firebase-adminsdk-r5uil-713d056715.json
+# Firebase Admin SDK
+*v-form*.json
