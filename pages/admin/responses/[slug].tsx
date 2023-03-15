@@ -179,11 +179,11 @@ export async function getServerSideProps(context: GetServerSidePropsContext) {
             .where("form", "==", slug)
             .get()
             .then((snapshot) => {
-                snapshot.docs.map((doc) => {
+                let data = snapshot.docs.map((doc) => {
                     let data = doc.data();
                     return data;
                 });
-                return snapshot;
+                return data;
             });
 
         let form = await admin
