@@ -10,7 +10,7 @@ import {
 } from "firebase/firestore";
 import React, { useState, useEffect, useRef } from "react";
 import { v4 as uuidv4 } from "uuid";
-import { Form, Question, Whitelist } from "@/lib/types";
+import { Form, FormOptions, Question, Whitelist } from "@/lib/types";
 import { InferGetServerSidePropsType, GetServerSidePropsContext } from "next";
 import { firestore } from "@lib/firebase";
 import nookies from "nookies";
@@ -42,58 +42,24 @@ export default function EditPage(
 		event.returnValue = "";
 	};
 
-	// Whitelist option preparation
-	// const whitelistAll = () => {
-	// 	// Get all possible whitelists
-	// 	const docSnap = props.whitelists;
-	// 	// setWhitelists(docSnap.docs);
-	// 	// An array of tuples [[id, name]...]
-	// 	let whitelistId_Name = Array(docSnap.docs.length);
-	// 	docSnap.docs.map((doc, i) => {
-	// 		const pair: readonly [id: String, name: String] = [
-	// 			doc.id,
-	// 			doc.data().name,
-	// 		];
-	// 		whitelistId_Name[i] = pair;
-	// 	});
-	// 	setWhitelists(whitelistId_Name);
-	// 	// return whitelistId_Name;
-	// };
-
-	// useEffect(() => whitelistAll(), []);
-
-	// Runs on mount & slug change
-	// useEffect(() => {
-	// 	(async () => {
-	// 		// Get document based on URL slug
-	// 		const data = await onMount(props.slug);
-	// 		setFormData(data);
-	// 		// Set questions
-	// 		setQuestionContent(data?.questions);
-
-	// 		// Prepare whitelist states
-	// 		// activeWhitelists: Currently set whitelists from DB
-	// 		const activeWhitelists = data?.options?.whitelist;
-	// 		// allWhitelists: All possible whitelists from DB
-	// 		const allWhitelists = await whitelistAll();
-
-	// 		let checkedPop = Array(allWhitelists.length);
-	// 		allWhitelists.map((_, i) => {
-	// 			if (activeWhitelists?.includes(allWhitelists[i][0])) {
-	// 				checkedPop[i] = true;
-	// 			} else {
-	// 				checkedPop[i] = false;
-	// 			}
-	// 		});
-	// 		setChecked(checkedPop);
-
-	// 		// Prepare toggle & Date
-	// 		setActive(data?.options?.active);
-	// 		setDate(data?.options?.endDate.seconds * 1000);
-	// 		// console.log(date);
-	// 		// console.log(new Date(date * 1000).toISOString().replace("Z", "") + "");
-	// 	})();
-	// }, []);
+	const updateOptions = (data: any, field: string) => {
+		let optionsCopy = { ...formOptions };
+		optionsCopy[field] = data;
+		setFormOptions(optionsCopy);
+		if (!toastId.current) {
+			window.addEventListener("beforeunload", unloadHandler);
+			toastId.current = toast.warn("Unsaved Changes", {
+				position: "bottom-left",
+				autoClose: false,
+				hideProgressBar: false,
+				closeOnClick: true,
+				pauseOnHover: true,
+				draggable: true,
+				progress: undefined,
+				theme: "colored",
+			});
+		}
+	};
 
 	const updateContent = (questionData: Question, i: number) => {
 		let contentCopy = questionContent;
@@ -118,6 +84,8 @@ export default function EditPage(
 	const handleSave = async () => {
 		let spreadOptionData = { ...formOptions };
 		let spreadQuestionData = [...questionContent];
+
+		console.log(spreadOptionData);
 
 		spreadOptionData.endDate = Timestamp.fromDate(
 			new Date(spreadOptionData.endDate)
@@ -244,7 +212,13 @@ export default function EditPage(
 						Form Settings
 					</span>
 				</div>
-				{showFormOptions && <FormOptionsMenu props={props} />}
+				{showFormOptions && (
+					<FormOptionsMenu
+						formOptions={props.form.options}
+						whitelists={props.whitelists}
+						update={updateOptions}
+					/>
+				)}
 				{questionSet}
 				<div className="col-start-4 my-4 flex items-center justify-center">
 					<svg
@@ -269,7 +243,7 @@ export default function EditPage(
 				<div className="col-span-1 col-start-4 mb-5 flex items-center justify-center">
 					<button
 						onClick={handleSave}
-						className="rounded border-2 border-gray-900 bg-green-300 px-7 py-2 hover:bg-green-500"
+						className="rounded border-0 border-gray-900 bg-emerald-500 px-7 py-2 text-neutral-50 hover:bg-emerald-500"
 					>
 						Save
 					</button>

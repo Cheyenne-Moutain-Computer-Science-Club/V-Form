@@ -73,7 +73,7 @@ export default function SearchableDropdown({
 			{isOpen && (
 				<div
 					className={
-						"absolute max-h-48 w-96 overflow-auto rounded border-2 border-neutral-800 bg-neutral-50 text-gray-900"
+						"absolute max-h-48 w-96 overflow-auto rounded border-2 border-t-0 border-neutral-800 bg-neutral-50 text-gray-900"
 					}
 				>
 					{filter(options).map((option: string, index: number) => {

@@ -72,6 +72,7 @@ export default function AdminFormPage(
 				active: true,
 				end: null,
 				submits: 1,
+				whitelists: [],
 			},
 			questions: [],
 		};

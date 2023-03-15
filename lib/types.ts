@@ -1,4 +1,4 @@
-import { DocumentReference } from "firebase/firestore";
+import { DocumentReference, Timestamp } from "firebase/firestore";
 
 export interface Form {
 	header: string;
@@ -25,9 +25,10 @@ export interface Whitelist {
 }
 
 export interface FormOptions {
+	[key: string]: string | boolean | number | string[];
 	active: boolean;
 	endDate: string;
 	submits: number;
 	user: string;
-	whitelists: DocumentReference<Whitelist>;
+	whitelists: string[];
 }
