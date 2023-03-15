@@ -1,17 +1,14 @@
 import Link from "next/link";
-import { useAuthState } from "react-firebase-hooks/auth";
-import { Form, UserOptions, Question, Response } from "@/lib/types";
+import { UserOptions, Question, Response } from "@/lib/types";
 import { ResponseQuestion } from "@/lib/responseManagement";
 import { useState, useEffect } from "react";
-import { auth } from "@/lib/firebase";
-import { useRouter } from "next/router";
 import { GetServerSidePropsContext } from "next";
 import { InferGetServerSidePropsType } from "next";
 import { doc, getDocs, getDoc, query, collection, where } from "firebase/firestore";
 import Footer from "@/components/footer";
 import { firestore } from "@/lib/firebase";
-import FormSplash from "@/components/creation-tools/FormSplash";
-import { signIn } from "@/lib/auth";
+import { admin } from "@lib/firebaseAdmin";
+import nookies from "nookies";
 
 function SingleResponse(
     props: InferGetServerSidePropsType<typeof getServerSideProps>
@@ -23,29 +20,30 @@ function SingleResponse(
         (async () => {
             let responseData: Array<Response> = [];
             // Responses
-            const responses = await getDocs(
-                query(
-                    collection(firestore, "responses"),
-                    where("form", "==", props.slug)
-                )
-            );
-            if (responses.docs.length === 0) {
+            // const responses = await getDocs(
+            //     query(
+            //         collection(firestore, "responses"),
+            //         where("form", "==", props.slug)
+            //     )
+            // );
+            const responses = props.responses;
+
+            if (responses.length === 0) {
                 // ---
             } else {
-                responseData = responses.docs.map((doc) =>
-					doc.data()
-				) as Response[];
+                responseData = responses as Response[];
             }
 
             // Questions
             // form: The form being viewed
-            const form = await getDoc(doc(firestore, "forms", `${props.slug}`));
+            // const form = await getDoc(doc(firestore, "forms", `${props.slug}`));
+            const form = props.form;
             // A new instance of ResponseQuestion will be created for each question
             // allQuestions: An array of all ResponseQuestions that will be used for the questions state
             // let allQuestions: Array<ResponseQuestion> = [];
 
 
-            const allQuestions = form.data()?.questions.map((ques: Question, i: number) => {
+            const allQuestions = form.questions.map((ques: Question, i: number) => {
                 // prompt: The question prompt + description
                 const prompt = ques.title + ": " + ques.description;
                 
@@ -68,7 +66,6 @@ function SingleResponse(
 
                 let question: ResponseQuestion = new ResponseQuestion(prompt, userItemData, num_responses);
                 question.sortOptions();
-                // console.log(question);
                 return question;
 
             });
@@ -167,12 +164,52 @@ function SingleResponse(
     )
 }
 
-export function getServerSideProps(context: GetServerSidePropsContext) {
-    const slug = context.params?.slug ?? null;
-	return {
-		props: {
-			slug: slug,
-		},
-	};
+export async function getServerSideProps(context: GetServerSidePropsContext) {
+    try {
+		const cookies = nookies.get(context);
+		const token = await admin.auth().verifyIdToken(cookies.token);
+
+		// the user is authenticated!
+		const { uid, email } = token;    
+        const slug = context.params?.slug;
+
+        let responses = await admin
+            .firestore()
+            .collection("responses")
+            .where("form", "==", slug)
+            .get()
+            .then((snapshot) => {
+                let data = snapshot.docs.map((doc) => {
+                    let data = doc.data();
+                    return data;
+                });
+                return data;
+            });
+
+        let form = await admin
+            .firestore()
+            .collection("forms")
+            .where("slug", "==", slug)
+            .get()
+            .then((snapshot) => {
+                let data = snapshot.docs[0].data()
+                data.options.endDate = data.options.endDate.toDate().toString();
+                return data;
+            });
+        
+
+        return {
+            props: {
+                slug: slug,
+                responses,
+                form
+            },
+        };
+    } catch (err) {
+        context.res.writeHead(302, { Location: "/login?slug=admin/responses" });
+		context.res.end();
+
+		return { props: {} as never };
+    }
 }
 export default SingleResponse
