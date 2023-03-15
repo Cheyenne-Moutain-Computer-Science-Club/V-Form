@@ -96,7 +96,7 @@ export default function Admin() {
 							</Link>
 							<Link
 								className="group col-start-2 flex h-32 flex-col items-center border-r-2 border-gray-900 p-8 hover:bg-gray-900"
-								href="/admin/forms"
+								href="/admin/responses"
 							>
 								<h1 className="text-2xl font-bold text-gray-900 group-hover:text-neutral-50">
 									Responses

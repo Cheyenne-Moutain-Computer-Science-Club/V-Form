@@ -70,11 +70,12 @@ export default function AdminFormPage(
 			slug: formID,
 			options: {
 				active: true,
-				end: null,
+				endDate: new Date(),
 				submits: 1,
 				whitelists: [],
 			},
 			questions: [],
+			
 		};
 
 		const formRef = doc(firestore, "forms", formID);

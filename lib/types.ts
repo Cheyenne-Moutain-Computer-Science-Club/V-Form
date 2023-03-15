@@ -31,4 +31,15 @@ export interface FormOptions {
 	submits: number;
 	user: string;
 	whitelists: string[];
+  
+export interface Response {
+	form: string
+	questionResponses: string[],
+	uid: string
+}
+
+// Used for response viewing only
+export interface UserOptions {
+    optionText: string,
+    numChosen: number
 }

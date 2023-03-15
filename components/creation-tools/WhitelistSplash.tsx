@@ -120,7 +120,7 @@ export default function WhitelistSplash({
 					)}
 				</div>
 				{deleteExpanded && (
-					<div className="flex w-full items-center justify-end">
+					<div className="flex w-96 items-center justify-end">
 						<svg
 							aria-hidden="true"
 							fill="none"
