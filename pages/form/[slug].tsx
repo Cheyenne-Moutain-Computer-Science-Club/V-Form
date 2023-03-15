@@ -16,52 +16,19 @@ import {
 import { useEffect, useState } from "react";
 import { useRouter } from "next/router";
 import Footer from "@/components/footer";
-import { Whitelist } from "@/lib/types";
+import { Form, Whitelist } from "@/lib/types";
 import LoadingPageState from "@/components/pageStates/Loading";
 import SearchableDropdown from "@/components/inputs/SearchableDropdown";
 import { Question } from "@/lib/types";
 import { admin } from "@/lib/firebaseAdmin";
+import nookies from "nookies";
 
-export default function Form(
+export default function FormTaking(
 	props: InferGetServerSidePropsType<typeof getServerSideProps>
 ) {
-	const [user, authLoading, authError] = useAuthState(auth);
 	const value = props.form;
 	const [questionResponses, setQuestionResponses] = useState([""]);
 	const router = useRouter();
-
-	// Check to see if user has already responded
-	useEffect(() => {
-		if (user)
-			getDocs(
-				query(
-					collection(firestore, "responses"),
-					where("form", "==", props.slug),
-					where("uid", "==", user?.uid)
-				)
-			).then((result) => {
-				if (result.docs.length > 0) {
-					router.push({
-						pathname: "/form/responded",
-						query: { slug: props.slug },
-					});
-				}
-			});
-	}, [user]);
-
-	// Todo Whitelist
-
-	if (authLoading) {
-		return <LoadingPageState />;
-	}
-
-	if (!user && !authLoading) {
-		router.push({
-			pathname: "/login",
-			query: { slug: props.slug },
-		});
-		return;
-	}
 
 	const questionsData = value?.questions;
 	const header = value?.header;
@@ -71,7 +38,7 @@ export default function Form(
 			query(
 				collection(firestore, "responses"),
 				where("form", "==", props.slug),
-				where("uid", "==", user?.uid)
+				where("uid", "==", props.user.uid)
 			)
 		);
 
@@ -81,7 +48,7 @@ export default function Form(
 			// create new response document
 			await addDoc(collection(firestore, "responses"), {
 				form: props.slug,
-				uid: user?.uid,
+				uid: props.user?.uid,
 				questionResponses: questionResponses,
 			});
 		}
@@ -93,7 +60,7 @@ export default function Form(
 		});
 	};
 
-	const questionComponents = questionsData.map((q: Question, i: number) => {
+	const questionComponents = questionsData?.map((q: Question, i: number) => {
 		return (
 			<div className="my-8" key={i}>
 				<div className="bg-accent flex h-12 items-center justify-between rounded-t border-2 border-gray-900 px-3">
@@ -165,40 +132,100 @@ export default function Form(
 }
 
 export async function getServerSideProps(ctx: GetServerSidePropsContext) {
-	let form = await admin
-		.firestore()
-		.collection("forms")
-		.where("slug", "==", ctx.params?.slug)
-		.get()
-		.then((snapshot) => {
-			if (snapshot.empty) {
-				ctx.res.writeHead(302, {
-					location: "/form/does-not-exist?slug=" + ctx.params?.slug,
-				});
-				ctx.res.end();
-				return null;
-			}
-			let data = snapshot.docs[0].data();
+	try {
+		const cookies = nookies.get(ctx);
+		const token = await admin.auth().verifyIdToken(cookies.token);
 
-			if (
-				data.options.endDate.toDate().getTime() < new Date().getTime()
-			) {
-				ctx.res.writeHead(302, {
-					location: "/form/closed?slug=" + ctx.params?.slug,
-				});
-				ctx.res.end();
-				return null;
-			}
+		// the user is authenticated!
+		const { uid, email } = token;
 
-			data.options.endDate = data.options.endDate.toDate().toString();
+		let responded = await admin
+			.firestore()
+			.collection("responses")
+			.where("uid", "==", uid)
+			.where("form", "==", ctx.params?.slug)
+			.get()
+			.then((snapshot) => {
+				if (!snapshot.empty) {
+					ctx.res.writeHead(302, {
+						Location: "/form/responded?slug=" + ctx.params?.slug,
+					});
+					ctx.res.end();
+				}
+				return;
+			});
 
-			return data;
+		let form = await admin
+			.firestore()
+			.collection("forms")
+			.where("slug", "==", ctx.params?.slug)
+			.get()
+			.then((snapshot) => {
+				if (snapshot.empty) {
+					ctx.res.writeHead(302, {
+						location:
+							"/form/does-not-exist?slug=" + ctx.params?.slug,
+					});
+					ctx.res.end();
+					return null;
+				}
+				let data = snapshot.docs[0].data();
+
+				if (
+					data.options.endDate.toDate().getTime() <
+					new Date().getTime()
+				) {
+					ctx.res.writeHead(302, {
+						location: "/form/closed?slug=" + ctx.params?.slug,
+					});
+					ctx.res.end();
+					return null;
+				}
+
+				data.options.endDate = data.options.endDate.toDate().toString();
+
+				return data as Form;
+			});
+
+		let whitelists: string[] = form!.options.whitelists;
+
+		let whitelistData = await Promise.all(
+			whitelists?.map(async (whitelist) => {
+				const snapshot = await admin
+					.firestore()
+					.collection("whitelists")
+					.doc(whitelist)
+					.get();
+				return snapshot.data() as Whitelist;
+			})
+		);
+
+		let whitelistEmails = whitelistData
+			.map((whitelist) => {
+				return whitelist.emails;
+			})
+			.flat();
+
+		if (!whitelistEmails.includes(email)) {
+			ctx.res.writeHead(302, {
+				location: "/form/closed?slug=" + ctx.params?.slug,
+			});
+			ctx.res.end();
+		}
+
+		return {
+			props: {
+				slug: ctx.params?.slug,
+				form: form,
+				user: { uid, email },
+			},
+		};
+	} catch (err) {
+		ctx.res.writeHead(302, {
+			Location: "/login?slug=form/" + ctx.params?.slug,
 		});
+		ctx.res.end();
 
-	return {
-		props: {
-			slug: ctx.params?.slug,
-			form: form,
-		},
-	};
+		return { props: {} as never };
+	}
 }
