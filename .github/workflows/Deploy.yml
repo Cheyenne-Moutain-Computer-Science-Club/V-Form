@@ -33,7 +33,7 @@ jobs:
               with:
                   name: "gcloud.json"
                   json: ${{ secrets.FIREBASE_ADMIN }}
-                  dir: "src/"
+                  dir: "/"
             - run: git config --global user.email "michaelhmehall@gmail.com" && git config --global user.name "Mike968" && git add . && git add --force src/gcloud.json && git status && git commit -a -m "Deploy Heroku Commit with the Credentials JSON created!"
 
             - name: Firebase Deploy
