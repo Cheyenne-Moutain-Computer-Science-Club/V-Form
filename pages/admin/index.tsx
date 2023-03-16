@@ -204,7 +204,7 @@ export async function getServerSideProps(ctx: GetServerSidePropsContext) {
 			.get()
 			.then((snapshot) => {
 				let data = snapshot.data();
-				if (!snapshot.exists || data?.email !== email) {
+				if (snapshot.exists || data?.email !== email) {
 					ctx.res.writeHead(302, {
 						Location:
 							"/admin/permissionDenied?slug=" + ctx.params?.slug,
@@ -220,7 +220,7 @@ export async function getServerSideProps(ctx: GetServerSidePropsContext) {
 			props: {},
 		};
 	} catch (err) {
-		ctx.res.writeHead(302, { Location: "/login?slug=admin/forms" });
+		ctx.res.writeHead(302, { Location: "/login?slug=admin" });
 		ctx.res.end();
 
 		return { props: {} as never };
