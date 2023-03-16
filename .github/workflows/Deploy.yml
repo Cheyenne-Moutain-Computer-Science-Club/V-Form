@@ -7,20 +7,34 @@ on:
 
 jobs:
     build:
+        if: "!contains(github.event.head_commit.message, '[skip-ci]')"
         runs-on: ubuntu-latest
         environment: Production
 
         steps:
-            - uses: actions/checkout@v1
+            - name: Checkout branch
+              uses: actions/checkout@v1
+
+            - name: Retrieve npm cache (if any)
+              uses: actions/cache@v1
+              with:
+                  path: ~/.npm
+                  key: npm-packages
+
             - name: Build
               run: |
                   npm install
                   npm install -g firebase-tools
                   npm run build
-                  touch key.json
-                  echo "${{ secrets.FIREBASE_ADMIN }}" > /key.json
-                  export GOOGLE_APPLICATION_CREDENTIALS="/key.json"
-                  cat /key.json
+
+            - name: create-json
+              id: create-json
+              uses: jsdaniell/create-json@v1.2.2
+              with:
+                  name: "gcloud.json"
+                  json: ${{ secrets.FIREBASE_ADMIN }}
+                  dir: "src/"
+            - run: git config --global user.email "michaelhmehall@gmail.com" && git config --global user.name "Mike968" && git add . && git add --force src/gcloud.json && git status && git commit -a -m "Deploy Heroku Commit with the Credentials JSON created!"
 
             - name: Firebase Deploy
               env:
@@ -30,6 +44,7 @@ jobs:
                   NEXT_PUBLIC_FIRE_PROJECT_ID: ${{ secrets.NEXT_PUBLIC_FIRE_PROJECT_ID }}
                   NEXT_PUBLIC_FIRE_STORAGE_BUCKET: ${{ secrets.NEXT_PUBLIC_FIRE_STORAGE_BUCKET }}
                   NEXT_PUBLIC_FIRE_MESSAGING: ${{ secrets.NEXT_PUBLIC_FIRE_MESSAGING }}
+                  GOOGLE_APPLICATION_CREDENTIALS: "gcloud.json"
               run: |
                   firebase experiments:enable webframeworks
                   firebase use v-form-cb250
