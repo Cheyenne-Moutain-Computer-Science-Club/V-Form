@@ -24,7 +24,7 @@ export default function WhitelistSplash({
 	useEffect(() => {
 		setWhitelistName(name);
 		setWhitelist(whitelistItems);
-	}, []);
+	}, [name, whitelistItems]);
 
 	const updateWhitelistName = (e: React.ChangeEvent<HTMLInputElement>) => {
 		setWhitelistName(e.target.value);

@@ -26,7 +26,7 @@ export default function FormOptionsMenu({
 				checkedCopy[i] = true;
 		});
 		setChecked(checkedCopy);
-	}, []);
+	});
 
 	const handleActiveChange = () => {
 		setActive(!active);
