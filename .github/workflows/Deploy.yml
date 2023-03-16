@@ -13,7 +13,6 @@ jobs:
         steps:
             - uses: actions/checkout@v1
             - name: Build
-
               run: |
                   npm install
                   npm install -g firebase-tools
@@ -22,9 +21,9 @@ jobs:
                   echo "${{ secrets.FIREBASE_ADMIN }}" > /key.json
                   export GOOGLE_APPLICATION_CREDENTIALS="/key.json"
                   cat /key.json
-    
+
             - name: Firebase Deploy
-            env:
+              env:
                   NEXT_PUBLIC_FIRE_API_KEY: ${{ secrets.NEXT_PUBLIC_FIRE_API_KEY }}
                   NEXT_PUBLIC_FIRE_APP_ID: ${{ secrets.NEXT_PUBLIC_FIRE_APP_ID }}
                   NEXT_PUBLIC_FIRE_AUTH_DOMAIN: ${{ secrets.NEXT_PUBLIC_FIRE_AUTH_DOMAIN }}
