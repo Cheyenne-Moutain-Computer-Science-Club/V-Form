@@ -82,14 +82,13 @@ export default function EditPage(
 
 	// Database outgoing interaction
 	const handleSave = async () => {
-		let spreadOptionData = { ...formOptions };
+		let spreadOptionData = {
+			questions: {
+				...formOptions,
+				endDate: Timestamp.fromDate(new Date(formOptions.endDate)),
+			},
+		};
 		let spreadQuestionData = [...questionContent];
-
-		console.log(spreadOptionData);
-
-		spreadOptionData.endDate = Timestamp.fromDate(
-			new Date(spreadOptionData.endDate)
-		);
 
 		let promise = setDoc(
 			doc(firestore, "forms", `${props.slug}`),
