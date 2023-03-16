@@ -138,6 +138,7 @@ export async function getServerSideProps(ctx: GetServerSidePropsContext) {
 
 		// the user is authenticated!
 		const { uid, email } = token;
+		if (!email) throw Error("User does not have an email");
 
 		let responded = await admin
 			.firestore()
@@ -208,7 +209,7 @@ export async function getServerSideProps(ctx: GetServerSidePropsContext) {
 
 		if (!whitelistEmails.includes(email)) {
 			ctx.res.writeHead(302, {
-				location: "/form/closed?slug=" + ctx.params?.slug,
+				location: "/permissionDenied?slug=/form/" + ctx.params?.slug,
 			});
 			ctx.res.end();
 		}

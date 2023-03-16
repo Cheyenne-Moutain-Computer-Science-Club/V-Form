@@ -7,8 +7,13 @@ import { signIn } from "@/lib/auth";
 import { Form } from "@/lib/types";
 import FormSplash from "@/components/creation-tools/FormSplash";
 import Link from "next/link";
+import { InferGetServerSidePropsType, GetServerSidePropsContext } from "next";
+import { admin } from "@lib/firebaseAdmin";
+import nookies from "nookies";
 
-export default function Admin() {
+export default function Admin(
+	props: InferGetServerSidePropsType<typeof getServerSideProps>
+) {
 	const [user, userLoading, userError] = useAuthState(auth);
 	const [forms, setForms] = useState([] as Form[]);
 
@@ -182,4 +187,42 @@ export default function Admin() {
 			<Footer />
 		</div>
 	);
+}
+
+export async function getServerSideProps(ctx: GetServerSidePropsContext) {
+	try {
+		const cookies = nookies.get(ctx);
+		const token = await admin.auth().verifyIdToken(cookies.token);
+
+		// the user is authenticated!
+		const { uid, email } = token;
+
+		let user = await admin
+			.firestore()
+			.collection("users")
+			.doc(uid)
+			.get()
+			.then((snapshot) => {
+				let data = snapshot.data();
+				if (!snapshot.exists || data?.email !== email) {
+					ctx.res.writeHead(302, {
+						Location:
+							"/admin/permissionDenied?slug=" + ctx.params?.slug,
+					});
+					ctx.res.end();
+					throw Error(
+						"User does not have permission to view this page"
+					);
+				}
+			});
+
+		return {
+			props: {},
+		};
+	} catch (err) {
+		ctx.res.writeHead(302, { Location: "/login?slug=admin/forms" });
+		ctx.res.end();
+
+		return { props: {} as never };
+	}
 }

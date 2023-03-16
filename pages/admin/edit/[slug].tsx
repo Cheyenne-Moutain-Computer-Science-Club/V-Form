@@ -282,9 +282,9 @@ export async function getServerSideProps(ctx: GetServerSidePropsContext) {
 			.collection("users")
 			.doc(uid)
 			.get()
-			.then((snaptshot) => {
-				let data = snaptshot.data();
-				if (data?.email !== email) {
+			.then((snapshot) => {
+				let data = snapshot.data();
+				if (!snapshot.exists || data?.email !== email) {
 					ctx.res.writeHead(302, {
 						Location:
 							"/admin/permissionDenied?slug=" + ctx.params?.slug,
