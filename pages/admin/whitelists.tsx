@@ -9,14 +9,21 @@ import {
 	DocumentData,
 	addDoc,
 	getDocsFromServer,
+	setDoc,
+	doc,
 } from "firebase/firestore";
-import { QuerySnapshot } from "firebase/firestore";
-import Footer from "@/components/footer";
+import Footer from "components/Footer";
 import { signIn } from "@/lib/auth";
 import WhitelistSplash from "@/components/creation-tools/WhitelistSplash";
 import Link from "next/link";
+import { GetServerSidePropsContext, InferGetServerSidePropsType } from "next";
+import nookies from "nookies";
+import { admin } from "@lib/firebaseAdmin";
+import { Whitelist } from "@/lib/types";
 
-export default function Whitelists() {
+export default function Whitelists(
+	props: InferGetServerSidePropsType<typeof getServerSideProps>
+) {
 	const [user, userLoading, userError] = useAuthState(auth);
 	const [newWhitelist, setNewWhitelist] = useState(false);
 	const [newWhitelistName, setNewWhitelistName] = useState("");
@@ -24,49 +31,14 @@ export default function Whitelists() {
 	const [newWhitelistLoading, setNewWhitelistLoading] = useState(false);
 	const [newWhitelistPlaceholder, setNewWhitelistPlaceholder] =
 		useState("Whitelist Name");
-	const [dataSnapshot, setDataSnapshot] = useState<
-		QuerySnapshot<DocumentData> | undefined
-	>(undefined);
+	const [whitelists, setWhitelists] = useState(props.whitelists);
 
-	useEffect(() => {
-		if (user) {
-			getDocs(
-				query(
-					collection(firestore, "whitelists"),
-					where("user", "==", user.uid)
-				)
-			).then((querySnapshot) => {
-				setDataSnapshot(querySnapshot);
-			});
-		}
-	}, [user]);
-
-	if (userLoading || !dataSnapshot) {
+	if (userLoading) {
 		return (
 			<div className="flex h-screen flex-col justify-between">
 				<main className="grid h-full items-center">
 					<h1 className="text-center text-3xl font-bold text-gray-900">
 						Loading...
-					</h1>
-				</main>
-				<Footer />
-			</div>
-		);
-	}
-
-	if (!user && !userLoading) {
-		return (
-			<div className="flex h-screen flex-col justify-between">
-				<main className="grid h-full items-center">
-					<h1 className="text-center text-3xl font-bold text-gray-900">
-						Please{" "}
-						<button
-							className="bg-gradient-to-r from-indigo-500 via-purple-500 to-pink-500 bg-clip-text text-transparent underline decoration-gray-900 decoration-dashed decoration-2 hover:decoration-wavy"
-							onClick={() => signIn()}
-						>
-							Log In
-						</button>{" "}
-						to continue
 					</h1>
 				</main>
 				<Footer />
@@ -92,8 +64,12 @@ export default function Whitelists() {
 				collection(firestore, "whitelists"),
 				where("user", "==", user?.uid)
 			)
-		).then((querySnapshot) => {
-			setDataSnapshot(querySnapshot);
+		).then((snapshot) => {
+			setWhitelists(
+				snapshot.docs.map((doc) => {
+					return doc.data() as Whitelist;
+				}) as Whitelist[]
+			);
 		});
 	};
 
@@ -110,10 +86,18 @@ export default function Whitelists() {
 
 		setNewWhitelistLoading(true);
 
-		addDoc(collection(firestore, "whitelists"), {
+		let newId = addDoc(collection(firestore, "whitelists"), {
 			user: user?.uid,
 			name: newWhitelistName,
 			emails: newWhitelistItems,
+		}).then((docRef) => {
+			setDoc(
+				doc(firestore, "whitelists", docRef.id),
+				{ id: docRef.id },
+				{ merge: true }
+			);
+
+			return docRef.id;
 		});
 
 		setNewWhitelist(false);
@@ -231,19 +215,18 @@ export default function Whitelists() {
 						</div>
 					)}
 					<div className="col-span-5 col-start-3">
-						{dataSnapshot.docs.map((list, i) => {
-							let data = list.data();
+						{whitelists.map((list) => {
 							return (
 								<WhitelistSplash
-									name={data.name}
-									whitelistItems={data.emails}
+									name={list.name}
+									whitelistItems={list.emails}
 									id={list.id}
 									key={list.id}
 									reload={reload}
 								/>
 							);
 						})}
-						{dataSnapshot.docs.length === 0 && !newWhitelist && (
+						{whitelists.length === 0 && !newWhitelist && (
 							<h4 className="p-96 font-light text-gray-500">
 								<svg
 									fill="none"
@@ -269,4 +252,57 @@ export default function Whitelists() {
 			<Footer />
 		</div>
 	);
+}
+
+export async function getServerSideProps(ctx: GetServerSidePropsContext) {
+	try {
+		const cookies = nookies.get(ctx);
+		const token = await admin.auth().verifyIdToken(cookies.token);
+
+		// the user is authenticated!
+		const { uid, email } = token;
+
+		let user = await admin
+			.firestore()
+			.collection("users")
+			.doc(uid)
+			.get()
+			.then((snaptshot) => {
+				let data = snaptshot.data();
+				if (data?.email !== email) {
+					ctx.res.writeHead(302, {
+						Location:
+							"/admin/permissionDenied?slug=" + ctx.params?.slug,
+					});
+					ctx.res.end();
+					throw Error(
+						"User does not have permission to view this page"
+					);
+				}
+			});
+
+		let whitelists = await admin
+			.firestore()
+			.collection("whitelists")
+			.where("user", "==", uid)
+			.get()
+			.then((snapshot) => {
+				let data: Whitelist[] = snapshot.docs.map((doc) => {
+					return doc.data() as Whitelist;
+				}) as Whitelist[];
+
+				return data;
+			});
+
+		return {
+			props: {
+				whitelists,
+			},
+		};
+	} catch (err) {
+		ctx.res.writeHead(302, { Location: "/login?slug=admin/forms" });
+		ctx.res.end();
+
+		return { props: {} as never };
+	}
 }

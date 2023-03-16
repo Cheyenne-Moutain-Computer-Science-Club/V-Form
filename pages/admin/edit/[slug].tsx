@@ -17,7 +17,7 @@ import nookies from "nookies";
 import { admin } from "@lib/firebaseAdmin";
 import FormOptionsMenu from "@/components/edit/FormOptions";
 import SearchableDropdownEdit from "@/components/edit/questionTypes/SearchableDropdownEdit";
-import Footer from "@/components/footer";
+import Footer from "components/Footer";
 import { Id, ToastContainer } from "react-toastify";
 import { toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
@@ -276,6 +276,25 @@ export async function getServerSideProps(ctx: GetServerSidePropsContext) {
 
 		// the user is authenticated!
 		const { uid, email } = token;
+
+		let user = await admin
+			.firestore()
+			.collection("users")
+			.doc(uid)
+			.get()
+			.then((snaptshot) => {
+				let data = snaptshot.data();
+				if (data?.email !== email) {
+					ctx.res.writeHead(302, {
+						Location:
+							"/admin/permissionDenied?slug=" + ctx.params?.slug,
+					});
+					ctx.res.end();
+					throw Error(
+						"User does not have permission to view this page"
+					);
+				}
+			});
 
 		let form: Form = await admin
 			.firestore()

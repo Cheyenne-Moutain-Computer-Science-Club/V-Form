@@ -15,7 +15,7 @@ import {
 } from "firebase/firestore";
 import { useEffect, useState } from "react";
 import { useRouter } from "next/router";
-import Footer from "@/components/footer";
+import Footer from "components/Footer";
 import { Form, Whitelist } from "@/lib/types";
 import LoadingPageState from "@/components/pageStates/Loading";
 import SearchableDropdown from "@/components/inputs/SearchableDropdown";
@@ -151,8 +151,8 @@ export async function getServerSideProps(ctx: GetServerSidePropsContext) {
 						Location: "/form/responded?slug=" + ctx.params?.slug,
 					});
 					ctx.res.end();
+					throw Error("User has already responded to this form");
 				}
-				return;
 			});
 
 		let form = await admin

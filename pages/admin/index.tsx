@@ -2,7 +2,7 @@ import React, { useEffect, useState } from "react";
 import { useAuthState } from "react-firebase-hooks/auth";
 import { firestore, auth } from "@lib/firebase";
 import { collection, getDocs, orderBy, query, where } from "firebase/firestore";
-import Footer from "@/components/footer";
+import Footer from "components/Footer";
 import { signIn } from "@/lib/auth";
 import { Form } from "@/lib/types";
 import FormSplash from "@/components/creation-tools/FormSplash";

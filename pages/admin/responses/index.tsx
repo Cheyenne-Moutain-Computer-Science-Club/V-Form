@@ -6,8 +6,14 @@ import { auth } from "@/lib/firebase";
 import { useRouter } from "next/router";
 import { GetServerSidePropsContext } from "next";
 import { InferGetServerSidePropsType } from "next";
-import { getDocs, query, collection, where, getFirestore } from "firebase/firestore";
-import Footer from "@/components/footer";
+import {
+	getDocs,
+	query,
+	collection,
+	where,
+	getFirestore,
+} from "firebase/firestore";
+import Footer from "components/Footer";
 import { firestore } from "@/lib/firebase";
 import { app } from "@/lib/firebase";
 import FormSplash from "@/components/creation-tools/FormSplash";
@@ -17,21 +23,21 @@ import FormSplashResponse from "@/components/creation-tools/FormSplashResponse";
 const db = getFirestore(app);
 
 function Responses() {
-    const router = useRouter();
+	const router = useRouter();
 
-    // [[id, name], [id, name], ...]
-    const [forms, setForms] = useState(Array<[string, string][]>)
-    useEffect(() => {
-        (async () => {
-            const allForms = await getDocs(collection(db, "forms")); 
-            const formTuples = allForms.docs.map((doc) => {
-                return [doc.id, doc.data().header];
-            });
-            setForms(formTuples);
-        })();
-    }, []);
-  return (
-    <div className="flex h-screen flex-col justify-between">
+	// [[id, name], [id, name], ...]
+	const [forms, setForms] = useState(Array<[string, string][]>);
+	useEffect(() => {
+		(async () => {
+			const allForms = await getDocs(collection(db, "forms"));
+			const formTuples = allForms.docs.map((doc) => {
+				return [doc.id, doc.data().header];
+			});
+			setForms(formTuples);
+		})();
+	}, []);
+	return (
+		<div className="flex h-screen flex-col justify-between">
 			<main className="mb-auto">
 				<div>
 					<div className="mt-20 grid grid-cols-9 grid-rows-1">
@@ -70,7 +76,7 @@ function Responses() {
 									key={i}
 								/>
 							))}
-							{forms.length === 0  && (
+							{forms.length === 0 && (
 								<h4 className="font-light text-gray-500">
 									There are no forms. Create one at:
 								</h4>
@@ -81,7 +87,7 @@ function Responses() {
 			</main>
 			<Footer />
 		</div>
-  )
+	);
 }
 
-export default Responses
+export default Responses;

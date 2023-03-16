@@ -1,4 +1,4 @@
-import Footer from "@components/footer";
+import Footer from "components/Footer";
 import { signIn } from "@/lib/auth";
 import { useRouter } from "next/router";
 import { auth } from "@/lib/firebase";

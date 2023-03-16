@@ -9,7 +9,7 @@ import {
 	doc,
 	setDoc,
 } from "firebase/firestore";
-import Footer from "@/components/footer";
+import Footer from "components/Footer";
 import { Form } from "@/lib/types";
 import FormSplash from "@/components/creation-tools/FormSplash";
 import { NextRouter, useRouter } from "next/router";
@@ -75,7 +75,6 @@ export default function AdminFormPage(
 				whitelists: [],
 			},
 			questions: [],
-			
 		};
 
 		const formRef = doc(firestore, "forms", formID);
@@ -220,6 +219,25 @@ export async function getServerSideProps(ctx: GetServerSidePropsContext) {
 
 		// the user is authenticated!
 		const { uid, email } = token;
+
+		let user = await admin
+			.firestore()
+			.collection("users")
+			.doc(uid)
+			.get()
+			.then((snaptshot) => {
+				let data = snaptshot.data();
+				if (data?.email !== email) {
+					ctx.res.writeHead(302, {
+						Location:
+							"/admin/permissionDenied?slug=" + ctx.params?.slug,
+					});
+					ctx.res.end();
+					throw Error(
+						"User does not have permission to view this page"
+					);
+				}
+			});
 
 		let forms = await admin
 			.firestore()
