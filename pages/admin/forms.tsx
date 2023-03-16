@@ -73,6 +73,7 @@ export default function AdminFormPage(
 				endDate: new Date(),
 				submits: 1,
 				whitelists: [],
+				user: user?.uid,
 			},
 			questions: [],
 		};
