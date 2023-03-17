@@ -44,8 +44,8 @@ jobs:
                   NEXT_PUBLIC_FIRE_PROJECT_ID: ${{ secrets.NEXT_PUBLIC_FIRE_PROJECT_ID }}
                   NEXT_PUBLIC_FIRE_STORAGE_BUCKET: ${{ secrets.NEXT_PUBLIC_FIRE_STORAGE_BUCKET }}
                   NEXT_PUBLIC_FIRE_MESSAGING: ${{ secrets.NEXT_PUBLIC_FIRE_MESSAGING }}
-                  GOOGLE_APPLICATION_CREDENTIALS: "gcloud.json"
+                  GOOGLE_APPLICATION_CREDENTIALS: "./gcloud.json"
               run: |
                   firebase experiments:enable webframeworks
                   firebase use v-form-cb250
-                  firebase deploy
+                  firebase deploy --non-interactive
