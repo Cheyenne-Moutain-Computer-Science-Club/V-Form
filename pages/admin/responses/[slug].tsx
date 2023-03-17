@@ -111,7 +111,10 @@ function SingleResponse(
 				: "Show More";
 
 		return (
-			<div key={i} className="mx-40 my-8 flex flex-col rounded border-2 border-gray-900 p-4">
+			<div
+				key={i}
+				className="mx-40 my-8 flex flex-col rounded border-2 border-gray-900 p-4"
+			>
 				<h2 className="font-semibold">
 					{i + 1}. {question.getQuestionText()}
 				</h2>
@@ -119,7 +122,10 @@ function SingleResponse(
 					{optionsToRender.map((option, j) => {
 						const percent = question.getPercent(j);
 						return (
-							<div key={i} className="mt-5 flex flex-col items-start">
+							<div
+								key={i}
+								className="mt-5 flex flex-col items-start"
+							>
 								<h3>{option.optionText}</h3>
 								<div className="relative w-1/4 pt-1">
 									<div className="mb-2 flex items-center justify-between">
@@ -207,24 +213,23 @@ export async function getServerSideProps(ctx: GetServerSidePropsContext) {
 		const { uid, email } = token;
 		const slug = ctx.params?.slug;
 
-		let user = await admin
-			.firestore()
-			.collection("users")
-			.doc(uid)
-			.get()
-			.then((snapshot) => {
-				let data = snapshot.data();
-				if (!snapshot.exists || data?.email !== email) {
-					ctx.res.writeHead(302, {
-						Location:
-							"/admin/permissionDenied?slug=" + ctx.params?.slug,
-					});
-					ctx.res.end();
-					throw Error(
-						"User does not have permission to view this page"
-					);
-				}
-			});
+		// let user = await admin
+		// 	.firestore()
+		// 	.collection("users")
+		// 	.doc(uid)
+		// 	.get()
+		// 	.then((snapshot) => {
+		// 		let data = snapshot.data();
+		// 		if (!snapshot.exists || data?.email !== email) {
+		// 			ctx.res.writeHead(302, {
+		// 				Location: "/permissionDenied?slug=" + ctx.params?.slug,
+		// 			});
+		// 			ctx.res.end();
+		// 			throw Error(
+		// 				"User does not have permission to view this page"
+		// 			);
+		// 		}
+		// 	});
 
 		let responses = await admin
 			.firestore()

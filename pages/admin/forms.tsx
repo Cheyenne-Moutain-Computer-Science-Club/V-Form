@@ -221,25 +221,24 @@ export async function getServerSideProps(ctx: GetServerSidePropsContext) {
 		// the user is authenticated!
 		const { uid, email } = token;
 
-		let user = await admin
-			.firestore()
-			.collection("users")
-			.doc(uid)
-			.get()
-			.then((snapshot) => {
-				let data = snapshot.data();
-				if (!snapshot.exists || data?.email !== email) {
-					ctx.res.writeHead(302, {
-						Location:
-							"/admin/permissionDenied?slug=" + ctx.params?.slug,
-					});
-					ctx.res.end();
-					throw Error(
-						"User does not have permission to view this page"
-					);
-				}
-				return data;
-			});
+		// let user = await admin
+		// 	.firestore()
+		// 	.collection("users")
+		// 	.doc(uid)
+		// 	.get()
+		// 	.then((snapshot) => {
+		// 		let data = snapshot.data();
+		// 		if (!snapshot.exists || data?.email !== email) {
+		// 			ctx.res.writeHead(302, {
+		// 				Location: "/permissionDenied?slug=" + ctx.params?.slug,
+		// 			});
+		// 			ctx.res.end();
+		// 			throw Error(
+		// 				"User does not have permission to view this page"
+		// 			);
+		// 		}
+		// 		return data;
+		// 	});
 
 		let forms = await admin
 			.firestore()
@@ -249,6 +248,7 @@ export async function getServerSideProps(ctx: GetServerSidePropsContext) {
 			.then((snapshot) => {
 				let data: Form[] = snapshot.docs.map((doc) => {
 					let data = doc.data();
+					console.log(data);
 					data.options.endDate = data.options.endDate
 						.toDate()
 						.toString();
