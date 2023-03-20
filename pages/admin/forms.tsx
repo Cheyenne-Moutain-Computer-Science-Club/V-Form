@@ -248,7 +248,6 @@ export async function getServerSideProps(ctx: GetServerSidePropsContext) {
 			.then((snapshot) => {
 				let data: Form[] = snapshot.docs.map((doc) => {
 					let data = doc.data();
-					console.log(data);
 					data.options.endDate = data.options.endDate
 						.toDate()
 						.toString();
@@ -260,7 +259,7 @@ export async function getServerSideProps(ctx: GetServerSidePropsContext) {
 
 		return {
 			props: {
-				forms: forms,
+				forms,
 			},
 		};
 	} catch (err) {
