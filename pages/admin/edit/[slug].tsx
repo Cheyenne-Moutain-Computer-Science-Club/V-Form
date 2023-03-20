@@ -83,17 +83,20 @@ export default function EditPage(
 	// Database outgoing interaction
 	const handleSave = async () => {
 		let spreadOptionData = {
-			questions: {
-				...formOptions,
-				endDate: Timestamp.fromDate(new Date(formOptions.endDate)),
-			},
+			...formOptions,
+			endDate: Timestamp.fromDate(new Date(formOptions.endDate)),
 		};
 		let spreadQuestionData = [...questionContent];
 
 		let promise = setDoc(
 			doc(firestore, "forms", `${props.slug}`),
-			{ questions: spreadQuestionData, options: spreadOptionData },
-			{ merge: true }
+			{
+				questions: spreadQuestionData,
+				options: spreadOptionData,
+				header: formData.header,
+				slug: formData.slug,
+			}
+			// { merge: true }
 		);
 		window.removeEventListener("beforeunload", unloadHandler);
 		toast.dismiss(toastId.current);
