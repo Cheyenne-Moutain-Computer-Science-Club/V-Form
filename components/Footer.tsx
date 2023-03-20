@@ -15,7 +15,7 @@ export default function Footer() {
 					</a>
 				</li>
 				<li>
-					<a href="#" className="mhover:underline mr-6">
+					<a href="https://www.youtube.com/watch?v=dQw4w9WgXcQ" className="mhover:underline mr-6">
 						Privacy Policy
 					</a>
 				</li>
