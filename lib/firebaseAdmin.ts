@@ -9,5 +9,5 @@ if (admin.apps.length === 0) {
 	  databaseURL: process.env.NEXT_PUBLIC_FIREBASE_DATABASE_URL,
 	});
   }
-
+  
 export { admin };
