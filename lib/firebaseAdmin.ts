@@ -1,12 +1,13 @@
 import * as admin from "firebase-admin";
 import { applicationDefault } from "firebase-admin/app";
 
-if (!admin.apps.length) {
-	admin.initializeApp();
-	// {
-	// credential: applicationDefault(),
-	// databaseURL: "https://<DATABASE_NAME>.firebaseio.com",
-	// }
-}
+const serviceAccount = JSON.parse(process.env.FIREBASE_SERVICE_ACCOUNT_KEY as string);
+
+if (admin.apps.length === 0) {
+	admin.initializeApp({
+	  credential: admin.credential.cert(serviceAccount),
+	  databaseURL: process.env.NEXT_PUBLIC_FIREBASE_DATABASE_URL,
+	});
+  }
 
 export { admin };
