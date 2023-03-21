@@ -21,7 +21,7 @@ import Footer from "components/Footer";
 import { Id, ToastContainer } from "react-toastify";
 import { toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
-import ConfirmationModal from "@/components/alerts/ConformationAlert";
+import ConfirmationModal from "@/components/alerts/ConfirmationAlert";
 
 export default function EditPage(
 	props: InferGetServerSidePropsType<typeof getServerSideProps>
