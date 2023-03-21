@@ -176,7 +176,7 @@ export default function Admin(
 							{forms.map((form, i) => (
 								<FormSplash
 									header={form.header}
-									slug={"1"}
+									slug={form.slug}
 									key={i}
 								/>
 							))}
