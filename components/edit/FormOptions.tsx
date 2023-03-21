@@ -85,7 +85,7 @@ export default function FormOptionsMenu({
 				Form Settings
 			</h2>
 			<hr className="col-span-3 col-start-1 mx-5 mb-3 h-1 rounded bg-gray-300" />
-			<div className="col-span-1 col-start-1">
+			<div className="col-span-1 col-start-1 ml-20">
 				<h2 className="font-semibold">Access:</h2>
 				<label className="flex justify-start">
 					<input
@@ -123,15 +123,12 @@ export default function FormOptionsMenu({
 					</label>
 				</div>
 			</div>
-			<div className="col-span-1 col-start-2">
+			<div className="col-span-1 col-start-3">
 				<h2 className="font-semibold">Permissions:</h2>
 				<div>
 					<h3 className="">Whitelists:</h3>
 					<div>{whitelistSet}</div>
 				</div>
-			</div>
-			<div className="col-span-1 col-start-3">
-				<h2 className="font-semibold">Something else:</h2>
 			</div>
 		</div>
 	);
