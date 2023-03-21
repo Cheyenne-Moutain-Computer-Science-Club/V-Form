@@ -83,20 +83,17 @@ export default function EditPage(
 	// Database outgoing interaction
 	const handleSave = async () => {
 		let spreadOptionData = {
-			...formOptions,
-			endDate: Timestamp.fromDate(new Date(formOptions.endDate)),
+			questions: {
+				...formOptions,
+				endDate: Timestamp.fromDate(new Date(formOptions.endDate)),
+			},
 		};
 		let spreadQuestionData = [...questionContent];
 
 		let promise = setDoc(
 			doc(firestore, "forms", `${props.slug}`),
-			{
-				questions: spreadQuestionData,
-				options: spreadOptionData,
-				header: formData.header,
-				slug: formData.slug,
-			}
-			// { merge: true }
+			{ questions: spreadQuestionData, options: spreadOptionData },
+			{ merge: true }
 		);
 		window.removeEventListener("beforeunload", unloadHandler);
 		toast.dismiss(toastId.current);
@@ -185,7 +182,7 @@ export default function EditPage(
 					</svg>
 					Back
 				</button>
-				<h1 className="col-span-1 col-start-4 flex justify-center text-3xl font-semibold">
+				<h1 className="col-span-3 col-start-3 flex justify-center text-3xl font-semibold">
 					{formData?.header}
 				</h1>
 				<div className="col-span-1 col-start-6 grid justify-items-end">
@@ -296,7 +293,7 @@ export async function getServerSideProps(ctx: GetServerSidePropsContext) {
 		// 			);
 		// 		}
 		// 	});
-
+		
 		let form: Form = await admin
 			.firestore()
 			.collection("forms")
