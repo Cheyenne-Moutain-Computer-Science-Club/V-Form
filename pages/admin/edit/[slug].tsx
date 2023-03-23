@@ -83,10 +83,8 @@ export default function EditPage(
 	// Database outgoing interaction
 	const handleSave = async () => {
 		let spreadOptionData = {
-			questions: {
 				...formOptions,
 				endDate: Timestamp.fromDate(new Date(formOptions.endDate)),
-			},
 		};
 		let spreadQuestionData = [...questionContent];
 
