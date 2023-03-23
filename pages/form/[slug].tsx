@@ -22,6 +22,7 @@ import SearchableDropdown from "@/components/inputs/SearchableDropdown";
 import { Question } from "@/lib/types";
 import { admin } from "@/lib/firebaseAdmin";
 import nookies from "nookies";
+import MultipleChoiceTypeQuestion from "@/components/inputs/MultipleChoice";
 
 export default function FormTaking(
 	props: InferGetServerSidePropsType<typeof getServerSideProps>

@@ -37,6 +37,8 @@ export default function EditPage(
 	const [showFormOptions, setShowFormOptions] = useState(false);
 	const [showModal, setShowModal] = useState(false);
 
+	const [showAddDropdown, setShowAddDropdown] = useState(false);
+
 	const unloadHandler = (event: BeforeUnloadEvent) => {
 		event.preventDefault();
 		event.returnValue = "";
@@ -227,7 +229,7 @@ export default function EditPage(
 						strokeWidth={1.5}
 						viewBox="0 0 24 24"
 						xmlns="http://www.w3.org/2000/svg"
-						onClick={addQuestion}
+						onClick={() => setShowAddDropdown(true)}
 						className="h-8 w-8 rounded text-gray-900 hover:cursor-pointer hover:bg-gray-900 hover:text-neutral-50"
 					>
 						<path
@@ -237,6 +239,16 @@ export default function EditPage(
 						/>
 					</svg>
 					<h2 className="mx-2 font-semibold">New Question</h2>
+				</div>
+				<div className="absolute right-0 z-10 mt-2 w-56 origin-top-right rounded-md bg-white shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none">
+					<div className="py-1" role="none">
+						<a href="#" className="text-gray-700 block px-4 py-2 text-sm">Account settings</a>
+						<a href="#" className="text-gray-700 block px-4 py-2 text-sm">Support</a>
+						<a href="#" className="text-gray-700 block px-4 py-2 text-sm">License</a>
+						<form>
+							<button type="submit" className="text-gray-700 block w-full px-4 py-2 text-left text-sm">Sign out</button>
+						</form>
+					</div>
 				</div>
 
 				<div className="col-span-1 col-start-4 mb-5 flex items-center justify-center">
