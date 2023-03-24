@@ -28,6 +28,7 @@ export interface FormOptions {
 	[key: string]: string | boolean | number | string[];
 	active: boolean;
 	endDate: string;
+
 	submits: number;
 	user: string;
 	whitelists: string[];

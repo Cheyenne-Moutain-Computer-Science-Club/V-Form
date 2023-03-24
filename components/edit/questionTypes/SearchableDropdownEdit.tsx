@@ -32,7 +32,7 @@ export default function SearchableDropdownEdit({
 	};
 
 	return (
-		<div className="flex flex-col rounded-b border-2 border-t-0 border-gray-900 p-4">
+		<div className="flex flex-col rounded-b p-4 shadow-lg">
 			<input
 				value={formData.title}
 				onChange={handleChange}
