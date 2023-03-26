@@ -134,6 +134,43 @@ export default function EditPage(
 		}
 	};
 
+	const launchForm = () => {
+		let spreadOptionData = {
+			...formOptions,
+			endDate: Timestamp.fromDate(new Date(formOptions.endDate)),
+			active: true,
+		};
+		let spreadQuestionData = [...questionContent];
+
+		let promise = setDoc(
+			doc(firestore, "forms", `${props.slug}`),
+			{ questions: spreadQuestionData, options: spreadOptionData },
+			{ merge: true }
+		);
+		window.removeEventListener("beforeunload", unloadHandler);
+		toast.dismiss(toastId.current);
+		toastId.current = undefined;
+		toast.promise(promise, {
+			pending: "Saving...",
+			success: "Changes saved!",
+			error: "There was an error saving your changes",
+		});
+
+		navigator.clipboard.writeText(
+			"https://v-form.vercel.app/form/" + props.slug
+		);
+
+		toast.info("Form URL copied to clipboard!", {
+			position: "bottom-left",
+			autoClose: 5000,
+			hideProgressBar: false,
+			closeOnClick: true,
+			pauseOnHover: true,
+			draggable: true,
+			theme: "colored",
+		});
+	};
+
 	const questionSet = questionContent?.map((question: Question, i) => {
 		return (
 			<div className="col-span-5 col-start-2 my-4" key={uuidv4()}>
@@ -200,6 +237,7 @@ export default function EditPage(
 						viewBox="0 0 24 24"
 						xmlns="http://www.w3.org/2000/svg"
 						aria-hidden="true"
+						onClick={() => launchForm()}
 						className="peer/launch mx-4 h-8 w-7 transition hover:-rotate-45 hover:cursor-pointer"
 					>
 						<path
