@@ -9,7 +9,11 @@ export default function FormOptionsMenu({
 }: {
 	formOptions: FormOptions;
 	whitelists: Whitelist[];
-	update: (data: any, field: string) => void;
+	update: (
+		data: any,
+		field: string,
+		arr?: { data: any; field: string }[] | null
+	) => void;
 	close: () => void;
 }) {
 	// Checkboxes
@@ -39,6 +43,11 @@ export default function FormOptionsMenu({
 		} else {
 			setUseDate(true);
 		}
+
+		if (formOptions.linkActive) setWhitelistStatus(2);
+		if (formOptions.noAccess) setWhitelistStatus(0);
+		if (!formOptions.noAccess && !formOptions.linkActive)
+			setWhitelistStatus(1);
 	}, []);
 
 	const handleActiveChange = () => {
@@ -77,8 +86,26 @@ export default function FormOptionsMenu({
 	};
 
 	const onChangeWhitelistStatus = (status: number) => {
-		setWhitelistStatus(status);
-		// update(status, "whitelistStatus");
+		if (status == 0) {
+			setWhitelistStatus(0);
+			update(0, "", [
+				{ data: true, field: "noAccess" },
+				{ data: false, field: "linkAccess" },
+			]);
+		} else if (status == 1) {
+			setWhitelistStatus(1);
+			update(0, "", [
+				{ data: false, field: "noAccess" },
+				{ data: false, field: "linkAccess" },
+			]);
+		} else if (status == 2) {
+			setWhitelistStatus(2);
+			update(0, "", [
+				{ data: false, field: "noAccess" },
+				{ data: true, field: "linkAccess" },
+			]);
+		}
+		console.log(status);
 	};
 
 	const whitelistSet = whitelists.map((list, i) => {
@@ -194,7 +221,7 @@ export default function FormOptionsMenu({
 								Settings
 							</button>
 						</li> */}
-						<li className="mr-2">
+						{/* <li className="mr-2">
 							<button
 								onClick={() => setTab(3)}
 								className={`group inline-flex rounded-t-lg border-b-2 p-4 hover:border-gray-300 ${
@@ -212,14 +239,14 @@ export default function FormOptionsMenu({
 								>
 									<path d="M9 2a1 1 0 000 2h2a1 1 0 100-2H9z"></path>
 									<path
-										fill-rule="evenodd"
+										fillRule="evenodd"
 										d="M4 5a2 2 0 012-2 3 3 0 003 3h2a3 3 0 003-3 2 2 0 012 2v11a2 2 0 01-2 2H6a2 2 0 01-2-2V5zm3 4a1 1 0 000 2h.01a1 1 0 100-2H7zm3 0a1 1 0 000 2h3a1 1 0 100-2h-3zm-3 4a1 1 0 100 2h.01a1 1 0 100-2H7zm3 0a1 1 0 100 2h3a1 1 0 100-2h-3z"
-										clip-rule="evenodd"
+										clipRule="evenodd"
 									></path>
 								</svg>
 								Whitelists
 							</button>
-						</li>
+						</li> */}
 					</ul>
 				</div>
 				<div className="w-full flex-col justify-between px-4 py-2">
@@ -278,7 +305,9 @@ export default function FormOptionsMenu({
 										type="radio"
 										value="option1"
 										checked={whitelistStatus === 0}
-										onChange={() => setWhitelistStatus(0)}
+										onChange={() =>
+											onChangeWhitelistStatus(0)
+										}
 										className="mr-1 h-5 w-5 rounded-full border-2 bg-neutral-50 accent-gray-900 focus:ring-0"
 									/>{" "}
 									<span>Nobody</span>
@@ -288,7 +317,9 @@ export default function FormOptionsMenu({
 										type="radio"
 										name="option2"
 										checked={whitelistStatus === 1}
-										onChange={() => setWhitelistStatus(1)}
+										onChange={() =>
+											onChangeWhitelistStatus(1)
+										}
 										className="mr-1 h-5 w-5 rounded-full border-2 bg-neutral-50 accent-gray-900 focus:ring-0"
 									/>{" "}
 									Whitelists
@@ -298,15 +329,36 @@ export default function FormOptionsMenu({
 										type="radio"
 										name="option2"
 										checked={whitelistStatus === 2}
-										onChange={() => setWhitelistStatus(2)}
-										className="mr-1 h-5 w-5 rounded-full border-2 bg-neutral-50 accent-gray-900 focus:ring-0"
+										onChange={() =>
+											onChangeWhitelistStatus(2)
+										}
+										className="peer mr-1 h-5 w-5 rounded-full border-2 bg-neutral-50 accent-gray-900 focus:ring-0"
 									/>{" "}
 									Everybody with Link
+									{/* <span className="absolute top-1/4 scale-0 rounded bg-gray-900 p-2 text-xs text-white peer-hover:scale-100">
+										Everybody with the link can access (this
+										still requires users to Sign In)
+									</span> */}
 								</label>
 							</div>
+							{whitelistStatus == 0 && (
+								<h4 className="text-gray-400">
+									Nobody will be able to access this form
+								</h4>
+							)}
 							{whitelistStatus == 1 && (
 								<>
-									<h3 className="">Whitelists:</h3>
+									<h4 className="text-gray-400">
+										Only emails included in the Whitelists
+										will be able to access this form
+									</h4>
+									<h3 className="mt-2">Whitelists:</h3>
+									{!checked.includes(true) && (
+										<h4 className="text-gray-400">
+											Nobody will be able to access this
+											form with no Whitelists enabled
+										</h4>
+									)}
 									<div className="h-36 overflow-y-auto">
 										{whitelistSet}
 									</div>
@@ -315,9 +367,9 @@ export default function FormOptionsMenu({
 						</>
 					)}
 				</div>
-				<div className="flex w-full border-t-2 border-gray-200">
+				{/* <div className="flex w-full border-t-2 border-gray-200">
 					Footer
-				</div>
+				</div> */}
 			</div>
 			<div className="fixed inset-0 z-40 bg-gray-900 opacity-25 backdrop-blur-3xl"></div>
 		</>

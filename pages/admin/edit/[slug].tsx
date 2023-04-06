@@ -43,9 +43,20 @@ export default function EditPage(
 		event.returnValue = "";
 	};
 
-	const updateOptions = (data: any, field: string) => {
+	const updateOptions = (
+		data: any,
+		field: string,
+		arr: { data: any; field: string }[] | null = null
+	) => {
 		let optionsCopy = { ...formOptions };
-		optionsCopy[field] = data;
+		if (!arr) {
+			optionsCopy[field] = data;
+		}
+		if (arr) {
+			arr.forEach((item) => {
+				optionsCopy[item.field] = item.data;
+			});
+		}
 		setFormOptions(optionsCopy);
 		if (!toastId.current) {
 			window.addEventListener("beforeunload", unloadHandler);
@@ -60,6 +71,9 @@ export default function EditPage(
 				theme: "colored",
 			});
 		}
+
+		console.log(optionsCopy);
+		console.log(data, field);
 	};
 
 	const updateContent = (questionData: Question, i: number) => {

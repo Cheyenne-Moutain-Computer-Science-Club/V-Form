@@ -110,16 +110,16 @@ export default function FormTaking(
 			<main className="mb-auto">
 				<div>
 					<div className="mt-20 grid grid-cols-9 grid-rows-1">
-						<h1 className="col-span-7 md:col-span-5 col-start-2 md:col-start-3 text-4xl font-bold text-gray-900">
+						<h1 className="col-span-7 col-start-2 text-4xl font-bold text-gray-900 md:col-span-5 md:col-start-3">
 							{header}
 						</h1>
-						<div className="col-span-7 md:col-span-5 col-start-2 md:col-start-3">
+						<div className="col-span-7 col-start-2 md:col-span-5 md:col-start-3">
 							{questionComponents}
 						</div>
 
 						<button
 							onClick={() => sumbitForm()}
-							className="col-start-4 md:col-start-5 h-12 w-36 rounded border-2 border-gray-900 hover:bg-gray-900 hover:font-bold hover:text-neutral-50"
+							className="col-start-4 h-12 w-36 rounded border-2 border-gray-900 hover:bg-gray-900 hover:font-bold hover:text-neutral-50 md:col-start-5"
 						>
 							Submit
 						</button>
@@ -207,7 +207,10 @@ export async function getServerSideProps(ctx: GetServerSidePropsContext) {
 			})
 			.flat();
 
-		if (!whitelistEmails.includes(email)) {
+		if (
+			!form?.options.linkAccess &&
+			(form?.options.noAccess || !whitelistEmails.includes(email))
+		) {
 			ctx.res.writeHead(302, {
 				location: "/permissionDenied?slug=/form/" + ctx.params?.slug,
 			});
