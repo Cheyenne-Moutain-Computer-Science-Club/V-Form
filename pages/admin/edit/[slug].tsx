@@ -20,13 +20,14 @@ import SearchableDropdownEdit from "@/components/edit/questionTypes/SearchableDr
 import Footer from "components/Footer";
 import { Id, ToastContainer } from "react-toastify";
 import { toast } from "react-toastify";
-import "react-toastify/dist/ReactToastify.css";
+// import "styles/toast.css";
 import ConfirmationModal from "@/components/alerts/ConfirmationAlert";
 
 export default function EditPage(
 	props: InferGetServerSidePropsType<typeof getServerSideProps>
 ) {
 	const formData = props.form;
+	const router = useRouter();
 
 	const [formOptions, setFormOptions] = useState(props.form.options);
 	const [questionContent, setQuestionContent] = useState(
@@ -42,9 +43,20 @@ export default function EditPage(
 		event.returnValue = "";
 	};
 
-	const updateOptions = (data: any, field: string) => {
+	const updateOptions = (
+		data: any,
+		field: string,
+		arr: { data: any; field: string }[] | null = null
+	) => {
 		let optionsCopy = { ...formOptions };
-		optionsCopy[field] = data;
+		if (!arr) {
+			optionsCopy[field] = data;
+		}
+		if (arr) {
+			arr.forEach((item) => {
+				optionsCopy[item.field] = item.data;
+			});
+		}
 		setFormOptions(optionsCopy);
 		if (!toastId.current) {
 			window.addEventListener("beforeunload", unloadHandler);
@@ -59,6 +71,9 @@ export default function EditPage(
 				theme: "colored",
 			});
 		}
+
+		console.log(optionsCopy);
+		console.log(data, field);
 	};
 
 	const updateContent = (questionData: Question, i: number) => {
@@ -83,8 +98,8 @@ export default function EditPage(
 	// Database outgoing interaction
 	const handleSave = async () => {
 		let spreadOptionData = {
-				...formOptions,
-				endDate: Timestamp.fromDate(new Date(formOptions.endDate)),
+			...formOptions,
+			endDate: Timestamp.fromDate(new Date(formOptions.endDate)),
 		};
 		let spreadQuestionData = [...questionContent];
 
@@ -125,12 +140,57 @@ export default function EditPage(
 		setQuestionContent(contentCopy);
 	};
 
+	const handleLeave = () => {
+		if (toastId.current) {
+			setShowModal(true);
+		} else {
+			router.push("/admin");
+		}
+	};
+
+	const launchForm = () => {
+		let spreadOptionData = {
+			...formOptions,
+			endDate: Timestamp.fromDate(new Date(formOptions.endDate)),
+			active: true,
+		};
+		let spreadQuestionData = [...questionContent];
+
+		let promise = setDoc(
+			doc(firestore, "forms", `${props.slug}`),
+			{ questions: spreadQuestionData, options: spreadOptionData },
+			{ merge: true }
+		);
+		window.removeEventListener("beforeunload", unloadHandler);
+		toast.dismiss(toastId.current);
+		toastId.current = undefined;
+		toast.promise(promise, {
+			pending: "Saving...",
+			success: "Changes saved!",
+			error: "There was an error saving your changes",
+		});
+
+		navigator.clipboard.writeText(
+			"https://v-form.vercel.app/form/" + props.slug
+		);
+
+		toast.info("Form URL copied to clipboard!", {
+			position: "bottom-left",
+			autoClose: 5000,
+			hideProgressBar: false,
+			closeOnClick: true,
+			pauseOnHover: true,
+			draggable: true,
+			theme: "colored",
+		});
+	};
+
 	const questionSet = questionContent?.map((question: Question, i) => {
 		return (
 			<div className="col-span-5 col-start-2 my-4" key={uuidv4()}>
-				<div className="bg-accent flex h-12 justify-between rounded-t border-2 border-gray-900 pl-2 pt-1 pr-2">
+				<div className="bg-accent flex h-12 justify-between rounded-t pl-2 pt-2 pr-2">
 					<h1 className="text-accent text-2xl font-bold">{i + 1}</h1>
-					<svg
+					{/* <svg
 						aria-hidden="true"
 						fill="none"
 						stroke="currentColor"
@@ -145,10 +205,11 @@ export default function EditPage(
 							strokeLinejoin="round"
 							d="M14.74 9l-.346 9m-4.788 0L9.26 9m9.968-3.21c.342.052.682.107 1.022.166m-1.022-.165L18.16 19.673a2.25 2.25 0 01-2.244 2.077H8.084a2.25 2.25 0 01-2.244-2.077L4.772 5.79m14.456 0a48.108 48.108 0 00-3.478-.397m-12 .562c.34-.059.68-.114 1.022-.165m0 0a48.11 48.11 0 013.478-.397m7.5 0v-.916c0-1.18-.91-2.164-2.09-2.201a51.964 51.964 0 00-3.32 0c-1.18.037-2.09 1.022-2.09 2.201v.916m7.5 0a48.667 48.667 0 00-7.5 0"
 						/>
-					</svg>
+					</svg> */}
 				</div>
 				<SearchableDropdownEdit
 					id={i}
+					deleteQuestion={removeQuestion}
 					update={updateContent}
 					questionData={question}
 				/>
@@ -160,7 +221,7 @@ export default function EditPage(
 		<div className="flex h-screen flex-col justify-between">
 			<main className="mt-4 mb-auto grid grid-cols-7">
 				<button
-					onClick={() => setShowModal(true)}
+					onClick={handleLeave}
 					className="font-xl group col-span-1 col-start-2 flex items-center rounded bg-neutral-50 px-2 font-bold text-gray-900 hover:bg-gray-900 hover:text-neutral-50"
 				>
 					<svg
@@ -183,7 +244,7 @@ export default function EditPage(
 				<h1 className="col-span-3 col-start-3 flex justify-center text-3xl font-semibold">
 					{formData?.header}
 				</h1>
-				<div className="col-span-1 col-start-6 grid justify-items-end">
+				<div className="col-span-1 col-start-6 ml-auto flex">
 					<svg
 						fill="none"
 						stroke="currentColor"
@@ -191,7 +252,27 @@ export default function EditPage(
 						viewBox="0 0 24 24"
 						xmlns="http://www.w3.org/2000/svg"
 						aria-hidden="true"
-						className="peer h-8 w-8 transition hover:rotate-45 hover:cursor-pointer"
+						onClick={() => launchForm()}
+						className="peer/launch mx-4 h-8 w-7 transition hover:-rotate-45 hover:cursor-pointer"
+					>
+						<path
+							strokeLinecap="round"
+							strokeLinejoin="round"
+							d="M15.59 14.37a6 6 0 01-5.84 7.38v-4.8m5.84-2.58a14.98 14.98 0 006.16-12.12A14.98 14.98 0 009.631 8.41m5.96 5.96a14.926 14.926 0 01-5.841 2.58m-.119-8.54a6 6 0 00-7.381 5.84h4.8m2.581-5.84a14.927 14.927 0 00-2.58 5.84m2.699 2.7c-.103.021-.207.041-.311.06a15.09 15.09 0 01-2.448-2.448 14.9 14.9 0 01.06-.312m-2.24 2.39a4.493 4.493 0 00-1.757 4.306 4.493 4.493 0 004.306-1.758M16.5 9a1.5 1.5 0 11-3 0 1.5 1.5 0 013 0z"
+						/>
+					</svg>
+					<span className="absolute top-10 scale-0 rounded bg-gray-900 p-2 text-xs text-white peer-hover/launch:scale-100">
+						Launch Form
+					</span>
+
+					<svg
+						fill="none"
+						stroke="currentColor"
+						strokeWidth={2}
+						viewBox="0 0 24 24"
+						xmlns="http://www.w3.org/2000/svg"
+						aria-hidden="true"
+						className="peer/settings h-8 w-8 transition hover:rotate-45 hover:cursor-pointer"
 						onClick={() => setShowFormOptions(!showFormOptions)}
 					>
 						<path
@@ -205,15 +286,16 @@ export default function EditPage(
 							d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"
 						/>
 					</svg>
-					<span className="absolute top-10 scale-0 rounded bg-gray-900 p-2 text-xs text-white peer-hover:scale-100">
+					<span className="absolute top-10 scale-0 rounded bg-gray-900 p-2 text-xs text-white peer-hover/settings:scale-100">
 						Form Settings
 					</span>
 				</div>
 				{showFormOptions && (
 					<FormOptionsMenu
-						formOptions={props.form.options}
+						formOptions={formOptions}
 						whitelists={props.whitelists}
 						update={updateOptions}
+						close={() => setShowFormOptions(false)}
 					/>
 				)}
 				{questionSet}
@@ -291,7 +373,7 @@ export async function getServerSideProps(ctx: GetServerSidePropsContext) {
 		// 			);
 		// 		}
 		// 	});
-		
+
 		let form: Form = await admin
 			.firestore()
 			.collection("forms")
@@ -308,7 +390,9 @@ export async function getServerSideProps(ctx: GetServerSidePropsContext) {
 				}
 
 				let data = snapshot.docs[0].data();
-				data.options.endDate = data.options.endDate.toDate().toString();
+				data.options.endDate = data.options.endDate
+					.toDate()
+					.toISOString();
 
 				return data as Form;
 			});

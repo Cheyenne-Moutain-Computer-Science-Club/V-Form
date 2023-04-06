@@ -31,6 +31,8 @@ export interface FormOptions {
 	submits: number;
 	user: string;
 	whitelists: string[];
+	linkAccess: boolean;
+	noAccess: boolean;
 }
 
 export interface Response {
