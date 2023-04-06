@@ -1,8 +1,6 @@
 import { GetServerSidePropsContext } from "next";
 import { InferGetServerSidePropsType } from "next";
 import { auth, firestore } from "@lib/firebase";
-import { useAuthState } from "react-firebase-hooks/auth";
-import { useDocumentData } from "react-firebase-hooks/firestore";
 import {
 	doc,
 	query,
@@ -17,7 +15,6 @@ import { useEffect, useState } from "react";
 import { useRouter } from "next/router";
 import Footer from "components/Footer";
 import { Form, Whitelist } from "@/lib/types";
-import LoadingPageState from "@/components/pageStates/Loading";
 import SearchableDropdown from "@/components/inputs/SearchableDropdown";
 import { Question } from "@/lib/types";
 import { admin } from "@/lib/firebaseAdmin";
