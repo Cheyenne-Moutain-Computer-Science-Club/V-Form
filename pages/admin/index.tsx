@@ -73,11 +73,11 @@ export default function Admin(
 				<div>
 					<div className="mt-20 grid grid-cols-9 grid-rows-1">
 						<h1 className="col-span-5 col-start-3 text-4xl font-bold text-gray-900">
-							Hello PERSON
+							Welcome!
 						</h1>
-						<div className="col-span-5 col-start-3 my-12 grid grid-cols-4 grid-rows-1 rounded border-2 border-gray-900">
+						<div className="col-span-5 col-start-3 my-12 grid grid-cols-4 grid-rows-1 rounded shadow-lg">
 							<Link
-								className="group col-start-1 flex h-32 flex-col items-center border-r-2 border-gray-900 p-8 hover:bg-gray-900"
+								className="group col-start-1 flex h-32 flex-col items-center rounded p-8 shadow-lg hover:bg-gray-900"
 								href="/admin/forms"
 							>
 								<h1 className="text-2xl font-bold text-gray-900 group-hover:text-neutral-50">
@@ -100,7 +100,7 @@ export default function Admin(
 								</svg>
 							</Link>
 							<Link
-								className="group col-start-2 flex h-32 flex-col items-center border-r-2 border-gray-900 p-8 hover:bg-gray-900"
+								className="group col-start-2 flex h-32 flex-col items-center rounded p-8 shadow-lg hover:bg-gray-900"
 								href="/admin/responses"
 							>
 								<h1 className="text-2xl font-bold text-gray-900 group-hover:text-neutral-50">
@@ -123,7 +123,7 @@ export default function Admin(
 								</svg>
 							</Link>
 							<Link
-								className="group col-start-3 flex h-32 flex-col items-center border-r-2 border-gray-900 p-8 hover:bg-gray-900"
+								className="group col-start-3 flex h-32 flex-col items-center rounded p-8 shadow-lg hover:bg-gray-900"
 								href="/admin/whitelists"
 							>
 								<h1 className="text-2xl font-bold text-gray-900 group-hover:text-neutral-50">
@@ -146,7 +146,7 @@ export default function Admin(
 								</svg>
 							</Link>
 							<Link
-								className="hover:cursor-not-allowed group col-start-4 flex h-32 flex-col items-center border-gray-900 p-8 bg-gray-500"
+								className="group col-start-4 flex h-32 flex-col items-center rounded bg-gray-500 p-8 shadow-lg hover:cursor-not-allowed"
 								href="/admin"
 							>
 								<h1 className="text-2xl font-bold text-gray-300">

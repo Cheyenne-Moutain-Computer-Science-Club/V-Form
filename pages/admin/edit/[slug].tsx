@@ -66,9 +66,6 @@ export default function EditPage(
 				theme: "colored",
 			});
 		}
-
-		console.log(optionsCopy);
-		console.log(data, field);
 	};
 
 	const updateContent = (questionData: Question, i: number) => {
@@ -122,7 +119,7 @@ export default function EditPage(
 			required: true,
 			type: "dropdown",
 			items: [],
-			placeholder: "Please begin typing",
+			placeholder: "",
 		};
 		// contentCopy.push(newQuestion);
 		const newContent = [...questionContent, newQuestion];

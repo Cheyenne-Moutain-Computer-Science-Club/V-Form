@@ -29,7 +29,7 @@ export default function SearchableDropdown({
 
 	// FIX TYPE!!!!!!
 	function toggle(e: any) {
-		// setIsOpen(e && e.target === inputRef.current);
+		setIsOpen(e && e.target === inputRef.current);
 	}
 
 	const getDisplayValue = () => {
@@ -46,11 +46,11 @@ export default function SearchableDropdown({
 	};
 
 	const drop = (e: any) => {
-		if (e.target.value.length > 0) {
-			setIsOpen(true);
-		} else {
-			setIsOpen(false);
-		}
+		// if (e.target.value.length > 0) {
+		setIsOpen(true);
+		// } else {
+		// 	setIsOpen(false);
+		// }
 	};
 
 	return (
@@ -67,7 +67,7 @@ export default function SearchableDropdown({
 				}}
 				onClick={toggle}
 				placeholder={placeholder}
-				className={`h-12 md:w-96 w-full rounded border-b-2 border-neutral-900 bg-neutral-200 p-2 text-gray-900 outline-none placeholder:italic placeholder:text-gray-400`}
+				className={`h-12 w-full rounded border-b-2 border-neutral-900 bg-neutral-200 p-2 text-gray-900 outline-none placeholder:italic placeholder:text-gray-400 md:w-96`}
 			/>
 
 			{isOpen && (

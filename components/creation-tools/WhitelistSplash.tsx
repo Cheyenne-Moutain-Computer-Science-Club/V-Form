@@ -60,7 +60,7 @@ export default function WhitelistSplash({
 	};
 
 	return (
-		<div className="my-8 rounded border-2 border-gray-900">
+		<div className="my-8 rounded shadow-lg">
 			<div className="flex w-full justify-between p-4">
 				{!open && <h2 className="text-xl">{whitelistName}</h2>}
 				{open && (
