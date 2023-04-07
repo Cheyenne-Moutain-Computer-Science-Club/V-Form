@@ -1,16 +1,12 @@
 import { useRouter } from "next/router";
 import {
-	collection,
 	doc,
 	setDoc,
-	getDoc,
-	getDocs,
-	DocumentData,
 	Timestamp,
 } from "firebase/firestore";
-import React, { useState, useEffect, useRef } from "react";
+import React, { useState, useRef } from "react";
 import { v4 as uuidv4 } from "uuid";
-import { Form, FormOptions, Question, Whitelist } from "@/lib/types";
+import { Form, Question, Whitelist } from "@/lib/types";
 import { InferGetServerSidePropsType, GetServerSidePropsContext } from "next";
 import { firestore } from "@lib/firebase";
 import nookies from "nookies";
@@ -20,7 +16,6 @@ import SearchableDropdownEdit from "@/components/edit/questionTypes/SearchableDr
 import Footer from "components/Footer";
 import { Id, ToastContainer } from "react-toastify";
 import { toast } from "react-toastify";
-// import "styles/toast.css";
 import ConfirmationModal from "@/components/alerts/ConfirmationAlert";
 
 export default function EditPage(
@@ -190,22 +185,6 @@ export default function EditPage(
 			<div className="col-span-5 col-start-2 my-4" key={uuidv4()}>
 				<div className="bg-accent flex h-12 justify-between rounded-t pl-2 pt-2 pr-2">
 					<h1 className="text-accent text-2xl font-bold">{i + 1}</h1>
-					{/* <svg
-						aria-hidden="true"
-						fill="none"
-						stroke="currentColor"
-						strokeWidth={2}
-						viewBox="0 0 24 24"
-						xmlns="http://www.w3.org/2000/svg"
-						className="h-8 w-8 items-center justify-center rounded p-1 text-gray-900 hover:cursor-pointer hover:bg-gray-900 hover:text-neutral-50"
-						onClick={() => removeQuestion(i)}
-					>
-						<path
-							strokeLinecap="round"
-							strokeLinejoin="round"
-							d="M14.74 9l-.346 9m-4.788 0L9.26 9m9.968-3.21c.342.052.682.107 1.022.166m-1.022-.165L18.16 19.673a2.25 2.25 0 01-2.244 2.077H8.084a2.25 2.25 0 01-2.244-2.077L4.772 5.79m14.456 0a48.108 48.108 0 00-3.478-.397m-12 .562c.34-.059.68-.114 1.022-.165m0 0a48.11 48.11 0 013.478-.397m7.5 0v-.916c0-1.18-.91-2.164-2.09-2.201a51.964 51.964 0 00-3.32 0c-1.18.037-2.09 1.022-2.09 2.201v.916m7.5 0a48.667 48.667 0 00-7.5 0"
-						/>
-					</svg> */}
 				</div>
 				<SearchableDropdownEdit
 					id={i}
@@ -355,24 +334,6 @@ export async function getServerSideProps(ctx: GetServerSidePropsContext) {
 
 		// the user is authenticated!
 		const { uid, email } = token;
-
-		// let user = await admin
-		// 	.firestore()
-		// 	.collection("users")
-		// 	.doc(uid)
-		// 	.get()
-		// 	.then((snapshot) => {
-		// 		let data = snapshot.data();
-		// 		if (!snapshot.exists || data?.email !== email) {
-		// 			ctx.res.writeHead(302, {
-		// 				Location: "/permissionDenied?slug=" + ctx.params?.slug,
-		// 			});
-		// 			ctx.res.end();
-		// 			throw Error(
-		// 				"User does not have permission to view this page"
-		// 			);
-		// 		}
-		// 	});
 
 		let form: Form = await admin
 			.firestore()

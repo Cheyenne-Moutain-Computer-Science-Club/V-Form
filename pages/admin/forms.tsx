@@ -217,28 +217,8 @@ export async function getServerSideProps(ctx: GetServerSidePropsContext) {
 	try {
 		const cookies = nookies.get(ctx);
 		const token = await admin.auth().verifyIdToken(cookies.token);
-
-		// the user is authenticated!
-		const { uid, email } = token;
-
-		// let user = await admin
-		// 	.firestore()
-		// 	.collection("users")
-		// 	.doc(uid)
-		// 	.get()
-		// 	.then((snapshot) => {
-		// 		let data = snapshot.data();
-		// 		if (!snapshot.exists || data?.email !== email) {
-		// 			ctx.res.writeHead(302, {
-		// 				Location: "/permissionDenied?slug=" + ctx.params?.slug,
-		// 			});
-		// 			ctx.res.end();
-		// 			throw Error(
-		// 				"User does not have permission to view this page"
-		// 			);
-		// 		}
-		// 		return data;
-		// 	});
+		
+		const { uid, email } = token; 
 
 		let forms = await admin
 			.firestore()

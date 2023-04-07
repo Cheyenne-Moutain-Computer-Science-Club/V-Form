@@ -4,16 +4,7 @@ import { ResponseQuestion } from "@/lib/responseManagement";
 import { useState, useEffect } from "react";
 import { GetServerSidePropsContext } from "next";
 import { InferGetServerSidePropsType } from "next";
-import {
-	doc,
-	getDocs,
-	getDoc,
-	query,
-	collection,
-	where,
-} from "firebase/firestore";
 import Footer from "components/Footer";
-import { firestore } from "@/lib/firebase";
 import { admin } from "@lib/firebaseAdmin";
 import nookies from "nookies";
 
@@ -26,13 +17,6 @@ function SingleResponse(
 	useEffect(() => {
 		(async () => {
 			let responseData: Array<Response> = [];
-			// Responses
-			// const responses = await getDocs(
-			//     query(
-			//         collection(firestore, "responses"),
-			//         where("form", "==", props.slug)
-			//     )
-			// );
 			const responses = props.responses;
 
 			if (responses.length === 0) {
@@ -47,7 +31,6 @@ function SingleResponse(
 			const form = props.form;
 			// A new instance of ResponseQuestion will be created for each question
 			// allQuestions: An array of all ResponseQuestions that will be used for the questions state
-			// let allQuestions: Array<ResponseQuestion> = [];
 
 			const allQuestions = form.questions.map(
 				(ques: Question, i: number) => {
@@ -213,28 +196,11 @@ export async function getServerSideProps(ctx: GetServerSidePropsContext) {
 		const { uid, email } = token;
 		const slug = ctx.params?.slug;
 
-		// let user = await admin
-		// 	.firestore()
-		// 	.collection("users")
-		// 	.doc(uid)
-		// 	.get()
-		// 	.then((snapshot) => {
-		// 		let data = snapshot.data();
-		// 		if (!snapshot.exists || data?.email !== email) {
-		// 			ctx.res.writeHead(302, {
-		// 				Location: "/permissionDenied?slug=" + ctx.params?.slug,
-		// 			});
-		// 			ctx.res.end();
-		// 			throw Error(
-		// 				"User does not have permission to view this page"
-		// 			);
-		// 		}
-		// 	});
-
 		let responses = await admin
 			.firestore()
 			.collection("responses")
 			.where("form", "==", slug)
+			.where("user.options", "==", uid)
 			.get()
 			.then((snapshot) => {
 				let data = snapshot.docs.map((doc) => {
