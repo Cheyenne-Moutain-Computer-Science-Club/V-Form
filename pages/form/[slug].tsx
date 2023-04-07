@@ -118,7 +118,7 @@ export default function FormTaking(
 			<main className="mb-auto">
 				<div>
 					<div className="mt-20 grid grid-cols-9 grid-rows-1">
-						<h1 className="col-span-7 col-start-2 text-4xl font-bold text-gray-900 md:col-span-5 md:col-start-3">
+						<h1 className="decoration-4 underline-offset-3 underline col-span-7 col-start-2 text-4xl font-bold text-gray-900 md:col-span-5 md:col-start-3">
 							{header}
 						</h1>
 						<div className="col-span-7 col-start-2 md:col-span-5 md:col-start-3">
@@ -127,7 +127,7 @@ export default function FormTaking(
 
 						<button
 							onClick={() => sumbitForm()}
-							className="col-start-4 h-12 w-36 rounded bg-gradient-to-r from-red-500 to-orange-500 font-bold shadow-lg hover:bg-gray-900 hover:text-neutral-50 disabled:cursor-not-allowed disabled:bg-neutral-200 disabled:text-neutral-400 md:col-start-5"
+							className="col-start-4 h-12 w-36 rounded border-black border-2 font-bold shadow-lg hover:bg-gray-900 hover:text-neutral-50 disabled:cursor-not-allowed disabled:bg-neutral-200 disabled:text-neutral-400 md:col-start-5"
 							disabled={questionResponses.includes("")}
 						>
 							Submit
