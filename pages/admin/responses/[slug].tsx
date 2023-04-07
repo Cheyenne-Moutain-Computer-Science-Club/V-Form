@@ -200,7 +200,7 @@ export async function getServerSideProps(ctx: GetServerSidePropsContext) {
 			.firestore()
 			.collection("responses")
 			.where("form", "==", slug)
-			.where("user.options", "==", uid)
+			.where("options.user", "==", uid)
 			.get()
 			.then((snapshot) => {
 				let data = snapshot.docs.map((doc) => {
@@ -214,6 +214,7 @@ export async function getServerSideProps(ctx: GetServerSidePropsContext) {
 			.firestore()
 			.collection("forms")
 			.where("slug", "==", slug)
+			.where("options.user", "==", uid)
 			.get()
 			.then((snapshot) => {
 				let data = snapshot.docs[0].data();
