@@ -26,7 +26,7 @@ export default function LoginPageState(
 				<h1 className="text-center text-3xl font-bold text-gray-900">
 					Please{" "}
 					<button
-						className="bg-gradient-to-r from-indigo-500 via-purple-500 to-pink-500 bg-clip-text text-transparent underline decoration-gray-900 decoration-dashed decoration-2 hover:decoration-wavy"
+						className="bg-gradient-to-r from-red-500 to-orange-500 bg-clip-text text-transparent underline decoration-gray-900 decoration-dashed decoration-2 hover:decoration-wavy"
 						onClick={() => signIn()}
 					>
 						Log In
