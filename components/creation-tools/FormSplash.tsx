@@ -9,7 +9,7 @@ export default function FormSplash({
 }) {
 	return (
 		<Link href={`/admin/edit/${slug}`}>
-			<div className="group my-8 flex justify-between rounded border-2 border-gray-900 p-4 hover:bg-gray-900">
+			<div className="group my-8 flex justify-between rounded p-4 shadow-lg hover:bg-gray-900">
 				<h2 className="text-xl group-hover:text-neutral-50">
 					{header}
 				</h2>

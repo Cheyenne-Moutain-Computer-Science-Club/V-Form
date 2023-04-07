@@ -175,7 +175,7 @@ export default function Whitelists(
 						</button>
 					</div>
 					{newWhitelist && (
-						<div className="col-span-5 col-start-3 my-8 flex flex-col items-center rounded border-2 border-gray-900 p-4 text-gray-900">
+						<div className="col-span-5 col-start-3 my-8 flex flex-col items-center rounded p-4 text-gray-900 shadow-lg">
 							<div className="flex w-full flex-col">
 								<div className="flex w-full justify-between">
 									<input

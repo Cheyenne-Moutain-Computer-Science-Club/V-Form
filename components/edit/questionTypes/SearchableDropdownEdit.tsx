@@ -16,8 +16,8 @@ export default function SearchableDropdownEdit({
 		title: questionData.title,
 		description: questionData.description,
 		items: questionData.items,
-		placeholder: "",
-		required: false,
+		placeholder: "Begin typing...",
+		required: true,
 		type: "dropdown",
 	});
 
@@ -80,7 +80,7 @@ export default function SearchableDropdownEdit({
 								{showDescription ? "Hide" : "Show"} description
 							</a>
 							{/* <a
-								href="#"
+								href="#"`
 								className="block px-4 py-2 text-sm text-gray-700"
 							>
 								Support
